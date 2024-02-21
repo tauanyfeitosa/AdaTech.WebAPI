@@ -108,7 +108,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
             else
             {
                 _logger.LogInformation("Realizando soft delete para o cliente com ID {Id}", id);
-                cliente.Ativo = true;
+                cliente.Ativo = false;
                 await _clienteRepository.UpdateAsync(cliente);
             }
 
