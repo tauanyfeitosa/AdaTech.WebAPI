@@ -3,16 +3,6 @@ namespace AdaTech.WebAPI.DadosLibrary.DTO.Objects
 {
     public class ItemVenda
     {
-        public ItemVenda(int id, int produtoId, int quantidade, decimal preco)
-        {
-            Id = id;
-            ProdutoId = produtoId;
-            Quantidade = quantidade;
-            Preco = preco;
-        }
-
-        public ItemVenda() { }
-
         public int Id { get; set; }
         public int ProdutoId { get; set; }
         public Produto Produto { get; set; }
