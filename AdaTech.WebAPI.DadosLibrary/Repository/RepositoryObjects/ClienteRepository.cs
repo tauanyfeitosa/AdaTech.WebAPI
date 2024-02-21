@@ -2,7 +2,7 @@
 using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
 using Microsoft.EntityFrameworkCore;
 
-namespace AdaTech.WebAPI.DadosLibrary.Repository
+namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
 {
     public class ClienteRepository : IRepository<Cliente>
     {

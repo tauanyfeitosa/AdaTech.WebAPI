@@ -2,6 +2,7 @@
 using AdaTech.WebAPI.DadosLibrary.Data;
 using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
 using AdaTech.WebAPI.DadosLibrary.Repository;
+using AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace AdaTech.WebAPI.SistemaVendas
@@ -16,6 +17,10 @@ namespace AdaTech.WebAPI.SistemaVendas
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped<IRepository<Cliente>, ClienteRepository>();
+            builder.Services.AddScoped<IRepository<ItemVenda>, ItemVendaRepository>();
+            builder.Services.AddScoped<IRepository<DevolucaoTroca>, DevolucaoTrocaRepository>();
+            builder.Services.AddScoped<IRepository<Venda>, VendaRepository>();
+            builder.Services.AddScoped<IRepository<Produto>, ProdutoRepository>();
 
             builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlite(
