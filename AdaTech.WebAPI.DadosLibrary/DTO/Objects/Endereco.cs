@@ -10,6 +10,6 @@ namespace AdaTech.WebAPI.DadosLibrary.DTO.Objects
         public string Cidade { get; set; }
         public string Estado { get; set; }
         public string CEP { get; set; }
-        public bool Ativo { get; set; }
+        public bool Ativo { get; set; } = true;
     }
 }
