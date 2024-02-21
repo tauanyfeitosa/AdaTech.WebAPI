@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34322.80
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdaTech.WebAPI.SistemaVendas", "AdaTech.WebAPI.SistemaVendas\AdaTech.WebAPI.SistemaVendas.csproj", "{129AD3ED-6221-4895-A0DF-B6FF83BBB48D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{129AD3ED-6221-4895-A0DF-B6FF83BBB48D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{129AD3ED-6221-4895-A0DF-B6FF83BBB48D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{129AD3ED-6221-4895-A0DF-B6FF83BBB48D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{129AD3ED-6221-4895-A0DF-B6FF83BBB48D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D39993C7-119E-4259-9F41-49CF94E8CB88}
+	EndGlobalSection
+EndGlobal
