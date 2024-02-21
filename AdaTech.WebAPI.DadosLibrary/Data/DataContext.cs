@@ -16,6 +16,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Data
         public DbSet<ItemVenda> ItensVenda { get; set; }
         public DbSet<DevolucaoTroca> DevolucoesTrocas { get; set; }
         public DbSet<ItemDevolucaoTroca> ItensDevolucaoTroca { get; set; }
+        public DbSet<Endereco> Enderecos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -40,22 +41,29 @@ namespace AdaTech.WebAPI.DadosLibrary.Data
                 .HasMany(dt => dt.Itens)
                 .WithOne(idt => idt.DevolucaoTroca)
                 .HasForeignKey(idt => idt.DevolucaoTrocaId);
+
             modelBuilder.Entity<ItemDevolucaoTroca>()
                 .HasOne(idt => idt.Produto)
                 .WithMany()
                 .HasForeignKey(idt => idt.ProdutoId);
+
             modelBuilder.Entity<ItemDevolucaoTroca>()
                 .HasOne(idt => idt.DevolucaoTroca)
                 .WithMany(dt => dt.Itens)
                 .HasForeignKey(idt => idt.DevolucaoTrocaId);
+
             modelBuilder.Entity<ItemVenda>()
                 .HasOne(iv => iv.Produto)
                 .WithMany()
                 .HasForeignKey(iv => iv.ProdutoId);
+
             modelBuilder.Entity<ItemVenda>()
                 .HasOne(iv => iv.Venda)
                 .WithMany(v => v.ItensVendas)
                 .HasForeignKey(iv => iv.VendaId);
+
+            modelBuilder.Entity<Cliente>()
+                .HasOne(c => c.Endereco);
         }
 
     }

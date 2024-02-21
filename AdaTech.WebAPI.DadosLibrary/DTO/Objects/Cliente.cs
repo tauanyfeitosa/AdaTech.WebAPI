@@ -10,7 +10,8 @@ namespace AdaTech.WebAPI.DadosLibrary.DTO.Objects
         public string Sobrenome { get; set; }
         public string Email { get; set; }
         public string Telefone { get; set; }
-        public string Endereco { get; set; }
+        public Endereco Endereco { get; set; }
+        public int EnderecoId { get; set; }
         public string CPF { get; set; }
         public IEnumerable<Venda> Vendas { get; set; }
     }
