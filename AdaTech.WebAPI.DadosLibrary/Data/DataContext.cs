@@ -63,8 +63,10 @@ namespace AdaTech.WebAPI.DadosLibrary.Data
                 .HasForeignKey(iv => iv.VendaId);
 
             modelBuilder.Entity<Cliente>()
-                .HasOne(c => c.Endereco);
+                .HasOne(c => c.Endereco)
+                .WithMany(e => e.Clientes)
+                .HasForeignKey(c => c.EnderecoId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
-
     }
 }
