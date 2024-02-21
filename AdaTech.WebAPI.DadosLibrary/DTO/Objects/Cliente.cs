@@ -14,5 +14,6 @@ namespace AdaTech.WebAPI.DadosLibrary.DTO.Objects
         public int EnderecoId { get; set; }
         public string CPF { get; set; }
         public IEnumerable<Venda> Vendas { get; set; }
+        public bool Ativo { get; set; }
     }
 }

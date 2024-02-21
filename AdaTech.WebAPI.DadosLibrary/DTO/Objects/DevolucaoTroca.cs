@@ -13,5 +13,6 @@ namespace AdaTech.WebAPI.DadosLibrary.DTO.Objects
         public TipoDevolucaoTroca Tipo { get; set; }
         public string Motivo { get; set; }
         public IEnumerable<ItemDevolucaoTroca> Itens { get; set; }
+        public bool Ativo { get; set; }
     }
 }

@@ -8,5 +8,6 @@ namespace AdaTech.WebAPI.DadosLibrary.DTO.Objects
         public string Descricao { get; set; }
         public decimal Preco { get; set; }
         public int Quantidade { get; set; }
+        public bool Ativo { get; set; }
     }
 }

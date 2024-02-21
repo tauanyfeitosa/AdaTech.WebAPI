@@ -11,5 +11,6 @@ namespace AdaTech.WebAPI.DadosLibrary.DTO.Objects
         public Cliente Cliente { get; set; }
         public StatusVenda StatusVenda { get; set; }
         public decimal ValorTotal => ItensVendas.Sum(p => p.ValorTotal);
+        public bool Ativo { get; set; }
     }
 }

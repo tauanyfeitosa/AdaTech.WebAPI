@@ -11,5 +11,6 @@ namespace AdaTech.WebAPI.DadosLibrary.DTO.Objects
         public int Quantidade { get; set; }
         public decimal Preco { get; set; }
         public decimal ValorTotal => Quantidade * Preco;
+        public bool Ativo { get; set; }
     }
 }
