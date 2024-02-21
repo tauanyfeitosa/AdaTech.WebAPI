@@ -12,6 +12,9 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.DTO
         [JsonIgnore]
         public string Numero { get; set; }
 
+        [JsonIgnore]
+        public string? Complemento { get; set; }
+
         [JsonPropertyName("neighborhood")]
         [Required(ErrorMessage = "O campo Bairro é obrigatório")]
         public string? Bairro { get; set; }

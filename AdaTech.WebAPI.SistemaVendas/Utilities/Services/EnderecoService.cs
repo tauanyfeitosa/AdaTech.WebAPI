@@ -23,6 +23,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services
         {
             var cep = clienteRequest.CEP.ToString();
             var numero = clienteRequest.Numero.ToString();
+            var complemento = clienteRequest.Complemento;
             EnderecoDTO enderecoDto = await GetEnderecoFromApi(cep);
 
             if (_enderecoRepository is EnderecoRepository enderecoRepository)
@@ -40,7 +41,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services
                     }
                 }
 
-                endereco = await TransformarDTO(enderecoDto, numero);
+                endereco = await TransformarDTO(enderecoDto, numero, complemento);
 
                 if (endereco != null)
                 {
@@ -80,7 +81,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services
             return await Task.Run(() => endereco.Rua == enderecoDTO.Rua && endereco.Bairro == enderecoDTO.Bairro && endereco.Cidade == enderecoDTO.Cidade && endereco.Estado == enderecoDTO.Estado && endereco.CEP == enderecoDTO.CEP);
         }
 
-        private async Task<Endereco> TransformarDTO (EnderecoDTO enderecoDTO, string numero)
+        private async Task<Endereco> TransformarDTO (EnderecoDTO enderecoDTO, string numero, string complemento)
         {
             return await Task.Run(() => new Endereco
             {
@@ -89,7 +90,8 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services
                 Cidade = enderecoDTO.Cidade,
                 Estado = enderecoDTO.Estado,
                 CEP = enderecoDTO.CEP,
-                Numero = numero
+                Numero = numero,
+                Complemento = complemento
             });
         }
     }

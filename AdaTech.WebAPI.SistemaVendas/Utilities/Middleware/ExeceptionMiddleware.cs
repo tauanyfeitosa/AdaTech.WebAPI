@@ -36,6 +36,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.Middleware
             {
                 NotFoundException _ => StatusCodes.Status404NotFound,
                 FailCreateUpdateException _ => StatusCodes.Status422UnprocessableEntity,
+                ErrorInputUserException _ => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
             };
 
