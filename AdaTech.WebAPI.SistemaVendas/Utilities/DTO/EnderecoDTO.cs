@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace AdaTech.WebAPI.SistemaVendas.DTO
+namespace AdaTech.WebAPI.SistemaVendas.Utilities.DTO
 {
     public class EnderecoDTO
     {
@@ -10,7 +10,7 @@ namespace AdaTech.WebAPI.SistemaVendas.DTO
         public string? Rua { get; set; }
 
         [JsonIgnore]
-        public int Numero { get; set; }
+        public string Numero { get; set; }
 
         [JsonPropertyName("neighborhood")]
         [Required(ErrorMessage = "O campo Bairro é obrigatório")]
