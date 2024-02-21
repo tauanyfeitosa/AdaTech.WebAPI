@@ -25,8 +25,19 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
 
         public async Task<bool> AddAsync(Cliente entity)
         {
-            _context.Clientes.Add(entity);
-            return await _context.SaveChangesAsync() > 0;
+            var existingCliente = await _context.Clientes
+                .AnyAsync(c => c.CPF == entity.CPF);
+
+            if (!existingCliente)
+            {
+                _context.Clientes.Add(entity);
+                var result = await _context.SaveChangesAsync();
+                return result > 0;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public async Task<bool> UpdateAsync(Cliente entity)

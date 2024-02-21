@@ -1,5 +1,6 @@
 ﻿using AdaTech.WebAPI.DadosLibrary.Data;
 using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +18,21 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
             _context = context;
         }
 
-        public async Task<bool> AddAsync(Endereco entity)
+        public async Task<bool> AddAsync(Endereco endereco)
         {
-            await _context.Enderecos.AddAsync(entity);
+            var existingEndereco = await _context.Enderecos
+                .FirstOrDefaultAsync(e => e.Id == endereco.Id);
 
-            return await _context.SaveChangesAsync() > 0;
+            if (existingEndereco == null)
+            {
+                await _context.Enderecos.AddAsync(endereco);
+                var result = await _context.SaveChangesAsync();
+                return result > 0;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -50,6 +61,18 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
             _context.Enderecos.Update(entity);
             await _context.SaveChangesAsync();
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<Endereco> GetByCEPAsync(string cep)
+        {
+            var entity =  await _context.Enderecos.FirstOrDefaultAsync(e => e.CEP == cep);
+
+            if (entity != null)
+            {
+                return entity;
+            }
+
+            return null;
         }
     }
 }
