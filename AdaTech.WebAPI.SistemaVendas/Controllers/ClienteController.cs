@@ -74,6 +74,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
                 throw new NotFoundException("CEP inválido ou não encontrado. Experimente outro CEP!");
             }
 
+            endereco.Ativo = true;
             await _enderecoRepository.AddAsync(endereco);
 
             var cliente = new Cliente
@@ -170,7 +171,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         {
             _logger.LogInformation("Atualizando status do cliente com ID: {Id}", id);
 
-            var cliente = await _clienteRepository.GetByIdAsync(id);
+            var cliente = await _clienteRepository.GetByIdActivateAsync(id);
             if (cliente == null)
             {
                 _logger.LogWarning("Cliente com ID: {Id} não encontrado.", id);

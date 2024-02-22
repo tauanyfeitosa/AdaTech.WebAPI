@@ -119,7 +119,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         {
             _logger.LogInformation("Iniciando ativação/inativação do endereço com ID {Id}", id);
 
-            var endereco = await _enderecoRepository.GetByIdAsync(id);
+            var endereco = await _enderecoRepository.GetByIdActivateAsync(id);
             if (endereco == null)
             {
                 _logger.LogWarning("Endereço com ID {Id} não encontrado para ativação/inativação", id);

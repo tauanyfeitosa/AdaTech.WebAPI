@@ -173,7 +173,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         public async Task<IActionResult> Patch(int id, bool ativo)
         {
             _logger.LogInformation("Atualizando status do produto com ID: {Id}", id);
-            var produto = await _produtoRepository.GetByIdAsync(id);
+            var produto = await _produtoRepository.GetByIdActivateAsync(id);
             if (produto == null)
             {
                 _logger.LogWarning("Produto com ID: {Id} não encontrado.", id);
