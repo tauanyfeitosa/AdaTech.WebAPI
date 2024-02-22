@@ -5,7 +5,11 @@ using AdaTech.WebAPI.DadosLibrary.Repository;
 using AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Middleware;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Services;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Swagger;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 namespace AdaTech.WebAPI.SistemaVendas
 {
@@ -17,54 +21,86 @@ namespace AdaTech.WebAPI.SistemaVendas
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-            builder.Services.AddScoped<EnderecoService>();
-            builder.Services.AddScoped<IRepository<Cliente>, ClienteRepository>();
-            builder.Services.AddScoped<IRepository<ItemVenda>, ItemVendaRepository>();
-            builder.Services.AddScoped<IRepository<DevolucaoTroca>, DevolucaoTrocaRepository>();
-            builder.Services.AddScoped<IRepository<Venda>, VendaRepository>();
-            builder.Services.AddScoped<IRepository<Produto>, ProdutoRepository>();
-            builder.Services.AddScoped<IRepository<Endereco>, EnderecoRepository>();
-
-            builder.Services.AddDbContext<DataContext>(options =>
-                options.UseSqlite(
-                    builder.Configuration.GetConnectionString("DefaultConnection")
-                )
-            );
-
-            builder.Services.AddCors(options =>
+            builder.Services.AddSwaggerGen(c =>
             {
-                options.AddPolicy("AllowLocalhost5500",
-                    builder =>
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sistema de Vendas", Version = "v1" });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+
+                c.TagActionsBy(api =>
+                {
+                    if (api.GroupName != null)
                     {
-                        builder.WithOrigins("http://localhost:5500")
-                               .AllowAnyHeader()
-                               .AllowAnyMethod();
-                    });
-            });
+                        return new[] { api.GroupName };
+                    }
 
-            builder.Services.AddHttpClient();
+                    var controllerActionDescriptor = api.ActionDescriptor as ControllerActionDescriptor;
+                    if (controllerActionDescriptor != null)
+                    {
+                        var displayNameAttribute = controllerActionDescriptor.ControllerTypeInfo
+                            .GetCustomAttributes(typeof(SwaggerDisplayNameAttribute), true)
+                            .FirstOrDefault() as SwaggerDisplayNameAttribute;
 
-            var app = builder.Build();
+                        if (displayNameAttribute != null)
+                        {
+                            return new[] { displayNameAttribute.DisplayName };
+                        }
+                    }
 
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                    return new[] { api.ActionDescriptor.RouteValues["controller"] };
+                });
+                });
+
+
+
+                builder.Services.AddScoped<EnderecoService>();
+                builder.Services.AddScoped<IRepository<Cliente>, ClienteRepository>();
+                builder.Services.AddScoped<IRepository<ItemVenda>, ItemVendaRepository>();
+                builder.Services.AddScoped<IRepository<DevolucaoTroca>, DevolucaoTrocaRepository>();
+                builder.Services.AddScoped<IRepository<Venda>, VendaRepository>();
+                builder.Services.AddScoped<IRepository<Produto>, ProdutoRepository>();
+                builder.Services.AddScoped<IRepository<Endereco>, EnderecoRepository>();
+
+                builder.Services.AddDbContext<DataContext>(options =>
+                    options.UseSqlite(
+                        builder.Configuration.GetConnectionString("DefaultConnection")
+                    )
+                );
+
+                builder.Services.AddCors(options =>
+                {
+                    options.AddPolicy("AllowLocalhost5500",
+                        builder =>
+                        {
+                            builder.WithOrigins("http://localhost:5500")
+                                   .AllowAnyHeader()
+                                   .AllowAnyMethod();
+                        });
+                });
+
+                builder.Services.AddHttpClient();
+
+                var app = builder.Build();
+
+                if (app.Environment.IsDevelopment())
+                {
+                    app.UseSwagger();
+                    app.UseSwaggerUI();
+                }
+
+                app.UseHttpsRedirection();
+
+                app.UseAuthorization();
+
+                app.UseCors("AllowLocalhost5500");
+
+                app.UseMiddleware<ExceptionMiddleware>();
+
+                app.MapControllers();
+
+                app.Run();
             }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-            app.UseCors("AllowLocalhost5500");
-
-            app.UseMiddleware<ExceptionMiddleware>();
-
-            app.MapControllers();
-
-            app.Run();
         }
-    }
-
 }
