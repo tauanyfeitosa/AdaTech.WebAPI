@@ -28,11 +28,10 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
                 await _context.Enderecos.AddAsync(endereco);
                 var result = await _context.SaveChangesAsync();
                 return result > 0;
+
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -48,7 +47,12 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
 
         public async Task<Endereco> GetByIdAsync(int id)
         {
-            return await _context.Enderecos.FindAsync(id);
+            var entity = await _context.Enderecos.FindAsync(id);
+
+            if (!entity.Ativo)
+                return null;
+
+            return entity;
         }
 
         public async Task<IEnumerable<Endereco>> GetAllAsync()
@@ -73,6 +77,11 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
             }
 
             return null;
+        }
+
+        public async Task<Endereco> GetByIdActivateAsync(int id)
+        {
+            return await _context.Enderecos.FindAsync(id);
         }
     }
 }

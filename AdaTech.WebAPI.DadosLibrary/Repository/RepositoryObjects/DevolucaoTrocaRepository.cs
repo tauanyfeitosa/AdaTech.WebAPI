@@ -32,7 +32,12 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
 
         public async Task<DevolucaoTroca> GetByIdAsync(int id)
         {
-            return await _context.DevolucoesTrocas.FindAsync(id);
+            var entity = await _context.DevolucoesTrocas.FindAsync(id);
+
+            if (!entity.Ativo)
+                return null;
+
+            return entity;
         }
 
         public async Task<IEnumerable<DevolucaoTroca>> GetAllAsync()
@@ -45,6 +50,11 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
             _context.DevolucoesTrocas.Update(entity);
             await _context.SaveChangesAsync();
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<DevolucaoTroca> GetByIdActivateAsync(int id)
+        {
+            return await _context.DevolucoesTrocas.FindAsync(id);
         }
     }
 }

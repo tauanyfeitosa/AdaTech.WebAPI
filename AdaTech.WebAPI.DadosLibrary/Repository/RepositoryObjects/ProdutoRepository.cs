@@ -37,7 +37,12 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
 
         public async Task<Produto> GetByIdAsync(int id)
         {
-            return await _context.Produtos.FindAsync(id);
+            var entity = await _context.Produtos.FindAsync(id);
+
+            if (!entity.Ativo)
+                return null;
+
+            return entity;
         }
 
         public async Task<IEnumerable<Produto>> GetAllAsync()
@@ -50,6 +55,11 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
             _context.Produtos.Update(entity);
             await _context.SaveChangesAsync();
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<Produto> GetByIdActivateAsync(int id)
+        {
+            return await _context.Produtos.FindAsync(id);
         }
     }
 }

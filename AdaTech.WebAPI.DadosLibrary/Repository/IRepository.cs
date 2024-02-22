@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository
         Task<bool> AddAsync(T entity);
         Task<bool> UpdateAsync(T entity);
         Task<bool> DeleteAsync(int id);
+        Task<T> GetByIdActivateAsync(int id);
     }
 
 }

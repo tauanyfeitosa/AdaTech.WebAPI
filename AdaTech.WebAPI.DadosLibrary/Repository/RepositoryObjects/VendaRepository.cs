@@ -46,5 +46,15 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
             await _context.SaveChangesAsync();
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<Venda> GetByIdActivateAsync(int id)
+        {
+            var entity = await _context.Vendas.FindAsync(id);
+
+            if (!entity.Ativo)
+                return null;
+
+            return entity;
+        }
     }
 }
