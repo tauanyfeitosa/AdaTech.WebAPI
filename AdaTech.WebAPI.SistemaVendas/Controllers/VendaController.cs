@@ -101,14 +101,17 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
                 var itemVenda = new ItemVenda
                 {
                     ProdutoId = produto.Id,
-                    Quantidade = itemRequest.Quantidade
-
+                    Quantidade = itemRequest.Quantidade,
+                    ValorTotal = produto.Preco * itemRequest.Quantidade
                 };
 
                 itensVenda.Add(itemVenda);
             }
 
+
+
             venda.ItensVendas = itensVenda;
+            venda.ValorTotal = itensVenda.Sum(x => x.ValorTotal);
             var success = await _vendaRepository.AddAsync(venda);
 
             if (!success)

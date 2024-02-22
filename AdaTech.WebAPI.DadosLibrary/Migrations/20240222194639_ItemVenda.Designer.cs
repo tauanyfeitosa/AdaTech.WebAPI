@@ -3,6 +3,7 @@ using System;
 using AdaTech.WebAPI.DadosLibrary.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdaTech.WebAPI.DadosLibrary.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240222194639_ItemVenda")]
+    partial class ItemVenda
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
@@ -202,9 +205,6 @@ namespace AdaTech.WebAPI.DadosLibrary.Migrations
 
                     b.Property<int>("StatusVenda")
                         .HasColumnType("INTEGER");
-
-                    b.Property<decimal>("ValorTotal")
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
