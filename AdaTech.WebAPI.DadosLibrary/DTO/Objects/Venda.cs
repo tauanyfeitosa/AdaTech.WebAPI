@@ -9,7 +9,7 @@ namespace AdaTech.WebAPI.DadosLibrary.DTO.Objects
         public DateTime DataVenda { get; set; }
         public int ClienteId { get; set; }
         public Cliente Cliente { get; set; }
-        public StatusVenda StatusVenda { get; set; }
+        public StatusVenda StatusVenda { get; set; } = StatusVenda.Efetuado;
         public decimal ValorTotal => ItensVendas.Sum(p => p.ValorTotal);
         public bool Ativo { get; set; } = true;
     }

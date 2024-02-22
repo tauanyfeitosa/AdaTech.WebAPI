@@ -3,7 +3,7 @@ using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
 using AdaTech.WebAPI.DadosLibrary.Repository;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Filters;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Swagger;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger;
 
 
 namespace AdaTech.WebAPI.SistemaVendas.Controllers

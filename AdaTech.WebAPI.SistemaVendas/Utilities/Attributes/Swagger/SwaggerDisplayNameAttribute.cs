@@ -1,4 +1,4 @@
-﻿namespace AdaTech.WebAPI.SistemaVendas.Utilities.Swagger
+﻿namespace AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class SwaggerDisplayNameAttribute : Attribute

@@ -3,10 +3,9 @@ namespace AdaTech.WebAPI.DadosLibrary.DTO.Enums
 {
     public enum StatusVenda
     {
-        Ativo = 1,
-        Devolvido = 2,
-        Trocado = 3,
-        Cancelado = 4,
-        Finalizado = 5
+        Devolvido = 1,
+        Trocado = 2,
+        Cancelado = 3,
+        Efetuado = 4
     }
 }

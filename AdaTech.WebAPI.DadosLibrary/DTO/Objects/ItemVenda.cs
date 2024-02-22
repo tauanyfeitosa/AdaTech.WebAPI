@@ -9,8 +9,7 @@ namespace AdaTech.WebAPI.DadosLibrary.DTO.Objects
         public int VendaId { get; set; }
         public Venda Venda { get; set; }
         public int Quantidade { get; set; }
-        public decimal Preco { get; set; }
-        public decimal ValorTotal => Quantidade * Preco;
+        public decimal ValorTotal => Quantidade * Produto.Preco;
         public bool Ativo { get; set; } = true;
     }
 }

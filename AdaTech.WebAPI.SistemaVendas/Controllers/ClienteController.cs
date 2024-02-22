@@ -4,7 +4,7 @@ using AdaTech.WebAPI.SistemaVendas.Utilities.DTO.ModelRequest;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Filters;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Services;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Swagger;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdaTech.WebAPI.SistemaVendas.Controllers
