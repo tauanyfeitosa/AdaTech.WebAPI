@@ -4,10 +4,12 @@ using AdaTech.WebAPI.SistemaVendas.Utilities.DTO.ModelRequest;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Filters;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Services;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Swagger;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdaTech.WebAPI.SistemaVendas.Controllers
 {
+    [SwaggerDisplayName("CRUD - Cliente")]
     [Route("api/[controller]")]
     [ApiController]
     [TypeFilter(typeof(LoggingActionFilter))]
@@ -26,6 +28,9 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Obtém todos os clientes.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Cliente>>> GetAllClientes()
         {
@@ -38,6 +43,9 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
             return Ok(clientes);
         }
 
+        /// <summary>
+        /// Obtém um cliente por Id.
+        /// </summary>
         [HttpGet("byId")]
         public async Task<ActionResult<Cliente>> GetCliente(int id)
         {
@@ -52,7 +60,10 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
             return Ok(cliente);
         }
 
-        [HttpPost]
+        /// <summary>
+        /// Cria um novo cliente juntamente com seu endereço.
+        /// </summary>
+        [HttpPost("create")]
         public async Task<ActionResult<Cliente>> PostCliente([FromBody] ClienteRequest clienteRequest)
         {
             _logger.LogInformation("Buscando endereço para o CEP: {CEP}", clienteRequest.CEP);
@@ -87,8 +98,10 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
             return CreatedAtAction(nameof(GetCliente), new { id = cliente.Id }, cliente);
         }
 
-
-        [HttpDelete("byId")]
+        /// <summary>
+        /// Efetua o hard ou soft delete de um cliente.
+        /// </summary>
+        [HttpDelete("delete")]
         public async Task<IActionResult> Delete(int id, [FromQuery] bool hardDelete = false)
         {
             _logger.LogInformation("Iniciando exclusão do cliente com ID {Id}", id);
@@ -116,7 +129,10 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
             return Ok("Excluído com sucesso!");
         }
 
-        [HttpPut("byId")]
+        /// <summary>
+        /// Atualiza um cliente.
+        /// </summary>
+        [HttpPut("update")]
         public async Task<IActionResult> PutCliente(int id, [FromBody] ClienteUpdateRequest clienteUpdateRequest)
         {
             _logger.LogInformation("Atualizando cliente com ID: {Id}", id);
@@ -146,7 +162,10 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
             return Ok("Cliente atualizado com sucesso!");
         }
 
-        [HttpPatch("byId")]
+        /// <summary>
+        /// Ativa ou inativa um cliente.
+        /// </summary>
+        [HttpPatch("activate")]
         public async Task<IActionResult> PatchCliente(int id, bool ativo)
         {
             _logger.LogInformation("Atualizando status do cliente com ID: {Id}", id);
