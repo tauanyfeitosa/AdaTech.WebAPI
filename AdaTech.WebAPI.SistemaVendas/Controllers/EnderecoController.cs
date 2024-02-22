@@ -3,9 +3,12 @@ using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
 using AdaTech.WebAPI.DadosLibrary.Repository;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Filters;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Swagger;
+
 
 namespace AdaTech.WebAPI.SistemaVendas.Controllers
 {
+    [SwaggerDisplayName("CRUD - Endereço")]
     [Route("api/[controller]")]
     [ApiController]
     [TypeFilter(typeof(LoggingActionFilter))]
@@ -20,6 +23,9 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Obtém a lista de todos os endereços.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Endereco>>> Get()
         {
@@ -31,6 +37,10 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
             }
             return Ok(enderecos);
         }
+
+        /// <summary>
+        /// Obtém um endereço ao informar um Id.
+        /// </summary>
 
         [HttpGet("byId")]
         public async Task<ActionResult<Endereco>> Get(int id)
@@ -46,7 +56,10 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
             return endereco;
         }
 
-        [HttpPut("byId")]
+        /// <summary>
+        /// Atualiza os campos de um endereço.
+        /// </summary>
+        [HttpPut("update")]
         public async Task<IActionResult> Put(int id, [FromBody] Endereco endereco)
         {
             if (id != endereco.Id)
@@ -66,7 +79,10 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
             return Ok("Atualizado com sucesso!");
         }
 
-        [HttpDelete("byId")]
+        /// <summary>
+        /// Efetua o hard ou soft delete de um endereço.
+        /// </summary>
+        [HttpDelete("delete")]
         public async Task<IActionResult> Delete(int id, [FromQuery] bool hardDelete = false)
         {
             _logger.LogInformation("Iniciando exclusão do endereço com ID {Id}", id);
@@ -94,5 +110,38 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
             return Ok("Excluído com sucesso!");
         }
 
+        /// <summary>
+        /// Ativa ou inativa um endereço
+        /// </summary>
+
+        [HttpPatch("activate")]
+        public async Task<IActionResult> Patch(int id, [FromQuery] bool ativar)
+        {
+            _logger.LogInformation("Iniciando ativação/inativação do endereço com ID {Id}", id);
+
+            var endereco = await _enderecoRepository.GetByIdAsync(id);
+            if (endereco == null)
+            {
+                _logger.LogWarning("Endereço com ID {Id} não encontrado para ativação/inativação", id);
+                throw new NotFoundException("Endereço não encontrado para ativação/inativação. Experimente buscar por outro ID!");
+            }
+
+            if (endereco.Ativo == ativar)
+            {
+                _logger.LogWarning("Endereço com ID {Id} já está ativado/inativado", id);
+                throw new ErrorInputUserException("Endereço já está ativado/inativado.");
+            }
+            endereco.Ativo = ativar;
+            var result = await _enderecoRepository.UpdateAsync(endereco);
+
+            if (!result)
+            {
+                _logger.LogWarning("Erro ao ativar/inativar endereço.");
+                throw new FailCreateUpdateException("Erro ao ativar/inativar endereço. Tente novamente!");
+            }
+
+            _logger.LogInformation("Endereço com ID {Id} ativado/inativado com sucesso. Ativar: {Ativar}", id, ativar);
+            return Ok("Ativado/Inativado com sucesso!");
+        }
     }
 }
