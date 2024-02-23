@@ -53,8 +53,6 @@ namespace AdaTech.WebAPI.SistemaVendas
                 });
                 });
 
-
-
             builder.Services.AddScoped<EnderecoService>();
             builder.Services.AddScoped<ClienteService>();
             builder.Services.AddScoped<IRepository<Cliente>, ClienteRepository>();
