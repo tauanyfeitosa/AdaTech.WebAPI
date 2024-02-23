@@ -57,11 +57,6 @@ namespace AdaTech.WebAPI.DadosLibrary.Data
                 .WithMany()
                 .HasForeignKey(iv => iv.ProdutoId);
 
-            modelBuilder.Entity<ItemVenda>()
-                .HasOne(iv => iv.Venda)
-                .WithMany(v => v.ItensVendas)
-                .HasForeignKey(iv => iv.VendaId);
-
             modelBuilder.Entity<Cliente>()
                 .HasOne(c => c.Endereco)
                 .WithMany(e => e.Clientes)
