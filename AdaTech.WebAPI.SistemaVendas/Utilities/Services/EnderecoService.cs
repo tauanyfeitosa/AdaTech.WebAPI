@@ -94,5 +94,20 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services
                 Complemento = complemento
             });
         }
+
+        public async Task<Endereco> UpdateAdress (Endereco endereco, EnderecoUpdateDTO enderecoUpdateDTO)
+        {
+            endereco.Rua = enderecoUpdateDTO.Rua;
+            endereco.Bairro = enderecoUpdateDTO.Bairro;
+            endereco.Cidade = enderecoUpdateDTO.Cidade;
+            endereco.Estado = enderecoUpdateDTO.Estado;
+            endereco.CEP = enderecoUpdateDTO.CEP;
+            endereco.Numero = enderecoUpdateDTO.Numero.ToString();
+
+            if (enderecoUpdateDTO.Complemento != null)
+                endereco.Complemento = enderecoUpdateDTO.Complemento;
+
+            return endereco;
+        }
     }
 }
