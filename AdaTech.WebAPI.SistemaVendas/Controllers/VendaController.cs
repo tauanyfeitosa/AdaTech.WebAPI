@@ -7,6 +7,7 @@ using AdaTech.WebAPI.SistemaVendas.Utilities.DTO;
 using AdaTech.WebAPI.SistemaVendas.Utilities.DTO.ModelRequest;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Services;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,10 +24,12 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         private readonly IRepository<Produto> _produtoRepository;
         private readonly ClienteService _clienteService;
         private readonly DataContext _context;
+        private readonly GenericsGetService<Venda> _genericsGetService;
 
         public VendaController(IRepository<Venda> vendaRepository, ILogger<VendaController> logger, 
             IRepository<Produto> produtoRepository, ClienteService clienteService, 
-            IRepository<ItemVenda> itemVendaRepository, DataContext dataContext)
+            IRepository<ItemVenda> itemVendaRepository, DataContext dataContext,
+            GenericsGetService<Venda> genericsGetService)
         {
             _vendaRepository = vendaRepository;
             _logger = logger;
@@ -34,6 +37,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
             _clienteService = clienteService;
             _itemVendaRepository = itemVendaRepository;
             _context = dataContext;
+            _genericsGetService = genericsGetService;
         }
 
         /// <summary>
@@ -42,13 +46,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var vendas = await _vendaRepository.GetAllAsync();
-            if (vendas.Count() == 0)
-            {
-                _logger.LogWarning("Nenhuma venda encontrada.");
-                throw new NotFoundException("Nenhuma venda encontrada. Experimente cadastrar uma nova venda!");
-            }
-            return Ok(vendas);
+            return Ok(await _genericsGetService.GetAllAsync(_vendaRepository, _logger));
         }
 
         /// <summary>
@@ -57,13 +55,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpGet("inactive-venda")]
         public async Task<IActionResult> GetInactiveVenda()
         {
-            var vendas = await _vendaRepository.GetInactiveAsync();
-            if (vendas.Count() == 0)
-            {
-                _logger.LogWarning("Nenhuma venda encontrada.");
-                throw new NotFoundException("Nenhuma venda encontrada. Experimente cadastrar uma nova venda!");
-            }
-            return Ok(vendas);
+            return Ok(await _genericsGetService.GetInactiveAsync(_vendaRepository, _logger));
         }
 
         /// <summary>
@@ -72,13 +64,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpGet("byId")]
         public async Task<IActionResult> Get(int id)
         {
-            var venda = await _vendaRepository.GetByIdAsync(id);
-            if (venda == null)
-            {
-                _logger.LogWarning("Venda com ID: {Id} não encontrada.", id);
-                throw new NotFoundException("Venda não encontrada. Experimente buscar por outro ID!");
-            }
-            return Ok(venda);
+            return Ok(await _genericsGetService.GetByIdAsync(_vendaRepository, _logger, id));
         }
 
         /// <summary>

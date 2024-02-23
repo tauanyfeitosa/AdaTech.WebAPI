@@ -1,6 +1,7 @@
 ﻿using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
 using AdaTech.WebAPI.DadosLibrary.Repository;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdaTech.WebAPI.SistemaVendas.Controllers
@@ -11,23 +12,20 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
     {
         private readonly IRepository<ItemVenda> _itemVendaRepository;
         private readonly ILogger<ItemVendaController> _logger;
+        private readonly GenericsGetService<ItemVenda> _genericsGetService;
 
-        public ItemVendaController(IRepository<ItemVenda> itemVendaRepository, ILogger<ItemVendaController> logger)
+        public ItemVendaController(IRepository<ItemVenda> itemVendaRepository, ILogger<ItemVendaController> logger, 
+            GenericsGetService<ItemVenda> genericsService)
         {
             _itemVendaRepository = itemVendaRepository;
             _logger = logger;
+            _genericsGetService = genericsService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var itemVendas = await _itemVendaRepository.GetAllAsync();
-            if (itemVendas == null)
-            {
-                _logger.LogWarning("Nenhum item de venda encontrado.");
-                throw new NotFoundException("Nenhum item de venda encontrado. Experimente cadastrar um novo item de venda!");
-            }
-            return Ok(itemVendas);
+            return Ok(await _genericsGetService.GetAllAsync(_itemVendaRepository, _logger));
         }
 
         /// <summary>
@@ -36,19 +34,13 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpGet("inactive-item-venda")]
         public async Task<IActionResult> GetInactiveItemVenda()
         {
-            var itemVendas = await _itemVendaRepository.GetInactiveAsync();
-            if (itemVendas == null)
-            {
-                _logger.LogWarning("Nenhum item de venda encontrado.");
-                throw new NotFoundException("Nenhum item de venda encontrado. Experimente cadastrar um novo item de venda!");
-            }
-            return Ok(itemVendas);
+            return Ok(await _genericsGetService.GetInactiveAsync(_itemVendaRepository, _logger));
         }
 
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("byId")]
+        public async Task<IActionResult> Get(int id)
         {
-            return "value";
+            return Ok(await _genericsGetService.GetByIdAsync(_itemVendaRepository, _logger, id));
         }
 
         [HttpPost]

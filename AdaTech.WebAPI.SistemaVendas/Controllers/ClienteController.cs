@@ -7,6 +7,7 @@ using AdaTech.WebAPI.SistemaVendas.Utilities.Services;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using AdaTech.WebAPI.DadosLibrary.Data;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService;
 
 namespace AdaTech.WebAPI.SistemaVendas.Controllers
 {
@@ -21,14 +22,16 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         private readonly EnderecoService _enderecoService;
         private readonly ILogger<ClienteController> _logger;
         private readonly DataContext _context;
+        private readonly GenericsGetService<Cliente> _genericsGetService;
 
         public ClienteController(IRepository<Cliente> clienteRepository, IRepository<Endereco> enderecoRepository, 
-            EnderecoService enderecoService, ILogger<ClienteController> logger, DataContext dataContext)
+            EnderecoService enderecoService, ILogger<ClienteController> logger, DataContext dataContext, GenericsGetService<Cliente> genericsService)
         {
             _clienteRepository = clienteRepository;
             _enderecoRepository = enderecoRepository;
             _enderecoService = enderecoService;
             _logger = logger;
+            _genericsGetService = genericsService;
         }
 
         /// <summary>
@@ -37,13 +40,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Cliente>>> GetAllClientes()
         {
-            var clientes = await _clienteRepository.GetAllAsync();
-            if (clientes == null)
-            {
-                _logger.LogWarning("Nenhum cliente encontrado.");
-                throw new NotFoundException("Nenhum cliente encontrado. Experimente cadastrar um novo cliente!");
-            }
-            return Ok(clientes);
+            return Ok(await _genericsGetService.GetAllAsync(_clienteRepository, _logger));
         }
 
         /// <summary>
@@ -52,13 +49,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpGet("inactive-client")]
         public async Task<ActionResult<IEnumerable<Cliente>>> GetInactiveClient()
         {
-            var clientes = await _clienteRepository.GetInactiveAsync();
-            if (clientes == null)
-            {
-                _logger.LogWarning("Nenhum cliente encontrado.");
-                throw new NotFoundException("Nenhum cliente encontrado. Experimente cadastrar um novo cliente!");
-            }
-            return Ok(clientes);
+            return Ok(await _genericsGetService.GetInactiveAsync(_clienteRepository, _logger));
         }
 
         /// <summary>
@@ -67,15 +58,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpGet("byId")]
         public async Task<ActionResult<Cliente>> GetCliente(int id)
         {
-            _logger.LogInformation("Buscando cliente com ID: {Id}", id);
-            var cliente = await _clienteRepository.GetByIdAsync(id);
-            if (cliente == null)
-            {
-                _logger.LogWarning("Cliente com ID: {Id} não encontrado.", id);
-                throw new NotFoundException("Cliente não encontrado. Experimente buscar por outro ID!");
-            }
-            _logger.LogInformation("Cliente com ID: {Id} recuperado com sucesso.", id);
-            return Ok(cliente);
+            return Ok(await _genericsGetService.GetByIdAsync(_clienteRepository, _logger, id));
         }
 
         /// <summary>

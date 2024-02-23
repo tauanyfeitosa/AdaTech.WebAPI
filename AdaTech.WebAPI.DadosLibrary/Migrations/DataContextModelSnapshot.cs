@@ -53,7 +53,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Migrations
 
                     b.HasIndex("EnderecoId");
 
-                    b.ToTable("Clientes");
+                    b.ToTable("Clientes", (string)null);
                 });
 
             modelBuilder.Entity("AdaTech.WebAPI.DadosLibrary.DTO.Objects.DevolucaoTroca", b =>
@@ -82,7 +82,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Migrations
 
                     b.HasIndex("VendaId");
 
-                    b.ToTable("DevolucoesTrocas");
+                    b.ToTable("DevolucoesTrocas", (string)null);
                 });
 
             modelBuilder.Entity("AdaTech.WebAPI.DadosLibrary.DTO.Objects.Endereco", b =>
@@ -124,7 +124,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Enderecos");
+                    b.ToTable("Enderecos", (string)null);
                 });
 
             modelBuilder.Entity("AdaTech.WebAPI.DadosLibrary.DTO.Objects.ItemVenda", b =>
@@ -154,7 +154,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Migrations
 
                     b.HasIndex("VendaId");
 
-                    b.ToTable("ItensVenda");
+                    b.ToTable("ItensVenda", (string)null);
                 });
 
             modelBuilder.Entity("AdaTech.WebAPI.DadosLibrary.DTO.Objects.Produto", b =>
@@ -182,7 +182,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Produtos");
+                    b.ToTable("Produtos", (string)null);
                 });
 
             modelBuilder.Entity("AdaTech.WebAPI.DadosLibrary.DTO.Objects.Venda", b =>
@@ -210,7 +210,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Migrations
 
                     b.HasIndex("ClienteId");
 
-                    b.ToTable("Vendas");
+                    b.ToTable("Vendas", (string)null);
                 });
 
             modelBuilder.Entity("AdaTech.WebAPI.DadosLibrary.DTO.Relacional.ItemDevolucaoTroca", b =>
@@ -234,7 +234,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Migrations
 
                     b.HasIndex("ProdutoId");
 
-                    b.ToTable("ItensDevolucaoTroca");
+                    b.ToTable("ItensDevolucaoTroca", (string)null);
                 });
 
             modelBuilder.Entity("AdaTech.WebAPI.DadosLibrary.DTO.Objects.Cliente", b =>

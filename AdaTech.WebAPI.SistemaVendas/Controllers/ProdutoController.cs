@@ -5,6 +5,7 @@ using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using AdaTech.WebAPI.DadosLibrary.Data;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService;
 
 namespace AdaTech.WebAPI.SistemaVendas.Controllers
 {
@@ -16,13 +17,15 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         private readonly IRepository<Produto> _produtoRepository;
         private readonly ILogger<ProdutoController> _logger;
         private readonly DataContext _context;
+        private readonly GenericsGetService<Produto> _genericsGetService;
 
         public ProdutoController(IRepository<Produto> produtoRepository, ILogger<ProdutoController> logger,
-            DataContext dataContext)
+            DataContext dataContext, GenericsGetService<Produto> genericsService)
         {
             _produtoRepository = produtoRepository;
             _logger = logger;
             _context = dataContext;
+            _genericsGetService = genericsService;
         }
 
         /// <summary>
@@ -31,16 +34,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            _logger.LogInformation("Buscando todos os produtos.");
-            var produtos = await _produtoRepository.GetAllAsync();
-
-            if (produtos == null)
-            {
-                _logger.LogWarning("Nenhum produto encontrado.");
-                throw new NotFoundException("Nenhum produto encontrado. Experimente cadastrar um novo produto!");
-            }
-            _logger.LogInformation("Produtos recuperados com sucesso.");
-            return Ok(produtos);
+            return Ok(await _genericsGetService.GetAllAsync(_produtoRepository, _logger));
         }
 
         /// <summary>
@@ -49,16 +43,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpGet("inactive-product")]
         public async Task<IActionResult> GetInactiveProduct()
         {
-            _logger.LogInformation("Buscando todos os produtos inativos.");
-            var produtos = await _produtoRepository.GetInactiveAsync();
-
-            if (produtos == null)
-            {
-                _logger.LogWarning("Nenhum produto encontrado.");
-                throw new NotFoundException("Nenhum produto encontrado. Experimente cadastrar um novo produto!");
-            }
-            _logger.LogInformation("Produtos inativos recuperados com sucesso.");
-            return Ok(produtos);
+            return Ok(await _genericsGetService.GetInactiveAsync(_produtoRepository, _logger));
         }
 
         /// <summary>
@@ -67,15 +52,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpGet("byId")]
         public async Task<IActionResult> Get(int id)
         {
-            _logger.LogInformation("Buscando produto com ID: {Id}", id);
-            var produto = await _produtoRepository.GetByIdAsync(id);
-            if (produto == null)
-            {
-                _logger.LogWarning("Produto com ID: {Id} não encontrado.", id);
-                throw new NotFoundException("Produto não encontrado. Experimente buscar por outro ID!");
-            }
-            _logger.LogInformation("Produto com ID: {Id} recuperado com sucesso.", id);
-            return Ok(produto);
+            return Ok(await _genericsGetService.GetByIdAsync(_produtoRepository, _logger, id));
         }
 
         /// <summary>

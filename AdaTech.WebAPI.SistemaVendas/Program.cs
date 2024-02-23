@@ -6,6 +6,7 @@ using AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Middleware;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Services;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -55,6 +56,7 @@ namespace AdaTech.WebAPI.SistemaVendas
 
             builder.Services.AddScoped<EnderecoService>();
             builder.Services.AddScoped<ClienteService>();
+            builder.Services.AddScoped(typeof(GenericsGetService<>));
             builder.Services.AddScoped<IRepository<Cliente>, ClienteRepository>();
             builder.Services.AddScoped<IRepository<ItemVenda>, ItemVendaRepository>();
             builder.Services.AddScoped<IRepository<DevolucaoTroca>, DevolucaoTrocaRepository>();

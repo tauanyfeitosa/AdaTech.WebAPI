@@ -7,6 +7,7 @@ using AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger;
 using AdaTech.WebAPI.DadosLibrary.Data;
 using AdaTech.WebAPI.SistemaVendas.Utilities.DTO;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Services;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService;
 
 
 namespace AdaTech.WebAPI.SistemaVendas.Controllers
@@ -21,14 +22,16 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         private readonly ILogger<EnderecoController> _logger;
         private readonly DataContext _context;
         private readonly EnderecoService _enderecoService;
+        private readonly GenericsGetService<Endereco> _genericsGetService;
 
         public EnderecoController(IRepository<Endereco> enderecoRepository, ILogger<EnderecoController> logger,
-            DataContext dataContext, EnderecoService enderecoService)
+            DataContext dataContext, EnderecoService enderecoService, GenericsGetService<Endereco> genericsService)
         {
             _enderecoRepository = enderecoRepository;
             _logger = logger;
             _context = dataContext;
             _enderecoService = enderecoService;
+            _genericsGetService = genericsService;
         }
 
         /// <summary>
@@ -37,13 +40,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Endereco>>> Get()
         {
-            var enderecos = await _enderecoRepository.GetAllAsync();
-            if (enderecos == null)
-            {
-                _logger.LogWarning("Nenhum endereço encontrado.");
-                throw new NotFoundException("Nenhum endereço encontrado. Experimente cadastrar um cliente e seu endereço vinculado!");
-            }
-            return Ok(enderecos);
+            return Ok(await _genericsGetService.GetAllAsync(_enderecoRepository, _logger));
         }
 
         /// <summary>
@@ -52,13 +49,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpGet("inactive-address")]
         public async Task<ActionResult<IEnumerable<Endereco>>> GetInactiveAddress()
         {
-            var enderecos = await _enderecoRepository.GetInactiveAsync();
-            if (enderecos == null)
-            {
-                _logger.LogWarning("Nenhum endereço encontrado.");
-                throw new NotFoundException("Nenhum endereço encontrado. Experimente cadastrar um cliente e seu endereço vinculado!");
-            }
-            return Ok(enderecos);
+            return Ok(await _genericsGetService.GetInactiveAsync(_enderecoRepository, _logger));
         }
 
         /// <summary>
@@ -68,15 +59,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpGet("byId")]
         public async Task<ActionResult<Endereco>> Get(int id)
         {
-            var endereco = await _enderecoRepository.GetByIdAsync(id);
-
-            if (endereco == null)
-            {
-                _logger.LogWarning("Endereço com ID: {Id} não encontrado.", id);
-                throw new NotFoundException("Endereço não encontrado. Experimente buscar por outro ID!");
-            }
-
-            return endereco;
+            return Ok(await _genericsGetService.GetByIdAsync(_enderecoRepository, _logger, id));
         }
 
         /// <summary>
