@@ -13,9 +13,25 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
             _context = context;
         }
 
-        public async Task<IEnumerable<Cliente>> GetAllAsync()
+        public async Task<IEnumerable<Cliente>> GetAsync()
         {
             return await _context.Clientes.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Cliente>> GetAllAsync()
+        {
+            return await _context.Clientes
+                .Where(cliente => cliente.Ativo)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Cliente>> GetInactiveAsync()
+        {
+            var clientes = await _context.Clientes
+                .Where(cliente => !cliente.Ativo)
+                .ToListAsync();
+
+            return clientes;
         }
 
         public async Task<Cliente> GetByIdAsync(int id)

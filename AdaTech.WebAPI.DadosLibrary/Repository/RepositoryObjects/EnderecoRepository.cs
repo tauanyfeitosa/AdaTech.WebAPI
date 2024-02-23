@@ -18,6 +18,11 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
             _context = context;
         }
 
+        public async Task<IEnumerable<Endereco>> GetAsync()
+        {
+            return await _context.Enderecos.ToListAsync();
+        }
+
         public async Task<bool> AddAsync(Endereco endereco)
         {
             var existingEndereco = await _context.Enderecos
@@ -57,13 +62,23 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
 
         public async Task<IEnumerable<Endereco>> GetAllAsync()
         {
-            return _context.Enderecos;
+            return await _context.Enderecos
+                .Where(endereco => endereco.Ativo)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Endereco>> GetInactiveAsync()
+        {
+            var enderecos = await _context.Enderecos
+                .Where(endereco => !endereco.Ativo)
+                .ToListAsync();
+
+            return enderecos;
         }
 
         public async Task<bool> UpdateAsync(Endereco entity)
         {
-            _context.Enderecos.Update(entity);
-            await _context.SaveChangesAsync();
+            _context.Entry(entity).State = EntityState.Modified;
             return await _context.SaveChangesAsync() > 0;
         }
 

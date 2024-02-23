@@ -1,5 +1,6 @@
 ﻿using AdaTech.WebAPI.DadosLibrary.Data;
 using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
 {
@@ -10,6 +11,11 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
         public VendaRepository(DataContext context)
         {
             _context = context;
+        }
+
+        public async Task<IEnumerable<Venda>> GetAsync()
+        {
+            return await _context.Vendas.ToListAsync();
         }
 
         public async Task<bool> AddAsync(Venda entity)
@@ -37,13 +43,23 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
 
         public async Task<IEnumerable<Venda>> GetAllAsync()
         {
-            return _context.Vendas;
+            return await _context.Vendas
+                .Where(venda => venda.Ativo)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Venda>> GetInactiveAsync()
+        {
+            var vendas = await _context.Vendas
+                                       .Where(venda => !venda.Ativo)
+                                       .ToListAsync();
+
+            return vendas;
         }
 
         public async Task<bool> UpdateAsync(Venda entity)
         {
-            _context.Vendas.Update(entity);
-            await _context.SaveChangesAsync();
+            _context.Entry(entity).State = EntityState.Modified;
             return await _context.SaveChangesAsync() > 0;
         }
 

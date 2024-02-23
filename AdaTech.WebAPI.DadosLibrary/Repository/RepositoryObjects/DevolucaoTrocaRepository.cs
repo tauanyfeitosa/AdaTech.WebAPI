@@ -1,5 +1,6 @@
 ﻿using AdaTech.WebAPI.DadosLibrary.Data;
 using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
 {
@@ -10,6 +11,11 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
         public DevolucaoTrocaRepository(DataContext context)
         {
             _context = context;
+        }
+
+        public async Task<IEnumerable<DevolucaoTroca>> GetAsync()
+        {
+            return await _context.DevolucoesTrocas.ToListAsync();
         }
 
         public async Task<bool> AddAsync(DevolucaoTroca entity)
@@ -42,13 +48,24 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
 
         public async Task<IEnumerable<DevolucaoTroca>> GetAllAsync()
         {
-            return _context.DevolucoesTrocas;
+            return await _context.DevolucoesTrocas
+                .Where(devolucaoTroca => devolucaoTroca.Ativo)
+                .ToListAsync();
+
+        }
+
+        public async Task<IEnumerable<DevolucaoTroca>> GetInactiveAsync()
+        {
+            var devolucoesTrocas = await _context.DevolucoesTrocas
+                .Where(devolucaoTroca => !devolucaoTroca.Ativo)
+                .ToListAsync();
+
+            return devolucoesTrocas;
         }
 
         public async Task<bool> UpdateAsync(DevolucaoTroca entity)
         {
-            _context.DevolucoesTrocas.Update(entity);
-            await _context.SaveChangesAsync();
+            _context.Entry(entity).State = EntityState.Modified;
             return await _context.SaveChangesAsync() > 0;
         }
 
