@@ -6,6 +6,7 @@ using AdaTech.WebAPI.SistemaVendas.Utilities.Filters;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Services;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger;
 using Microsoft.AspNetCore.Mvc;
+using AdaTech.WebAPI.DadosLibrary.Data;
 
 namespace AdaTech.WebAPI.SistemaVendas.Controllers
 {
@@ -19,8 +20,10 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         private readonly IRepository<Endereco> _enderecoRepository;
         private readonly EnderecoService _enderecoService;
         private readonly ILogger<ClienteController> _logger;
+        private readonly DataContext _context;
 
-        public ClienteController(IRepository<Cliente> clienteRepository, IRepository<Endereco> enderecoRepository, EnderecoService enderecoService, ILogger<ClienteController> logger)
+        public ClienteController(IRepository<Cliente> clienteRepository, IRepository<Endereco> enderecoRepository, 
+            EnderecoService enderecoService, ILogger<ClienteController> logger, DataContext dataContext)
         {
             _clienteRepository = clienteRepository;
             _enderecoRepository = enderecoRepository;
@@ -29,12 +32,27 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         }
 
         /// <summary>
-        /// Obtém todos os clientes.
+        /// Obtém todos os clientes ativos.
         /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Cliente>>> GetAllClientes()
         {
             var clientes = await _clienteRepository.GetAllAsync();
+            if (clientes == null)
+            {
+                _logger.LogWarning("Nenhum cliente encontrado.");
+                throw new NotFoundException("Nenhum cliente encontrado. Experimente cadastrar um novo cliente!");
+            }
+            return Ok(clientes);
+        }
+
+        /// <summary>
+        /// Obtém todos os clientes em soft delete.
+        /// </summary>
+        [HttpGet("inactive-client")]
+        public async Task<ActionResult<IEnumerable<Cliente>>> GetInactiveClient()
+        {
+            var clientes = await _clienteRepository.GetInactiveAsync();
             if (clientes == null)
             {
                 _logger.LogWarning("Nenhum cliente encontrado.");
@@ -66,37 +84,42 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpPost("create")]
         public async Task<ActionResult<Cliente>> PostCliente([FromBody] ClienteRequest clienteRequest)
         {
-            _logger.LogInformation("Buscando endereço para o CEP: {CEP}", clienteRequest.CEP);
-            var endereco = await _enderecoService.GetEnderecoDto(clienteRequest);
-            if (endereco == null)
+            using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                _logger.LogWarning("CEP inválido ou não encontrado: {CEP}", clienteRequest.CEP);
-                throw new NotFoundException("CEP inválido ou não encontrado. Experimente outro CEP!");
+                _logger.LogInformation("Buscando endereço para o CEP: {CEP}", clienteRequest.CEP);
+                var endereco = await _enderecoService.GetEnderecoDto(clienteRequest);
+                if (endereco == null)
+                {
+                    _logger.LogWarning("CEP inválido ou não encontrado: {CEP}", clienteRequest.CEP);
+                    throw new NotFoundException("CEP inválido ou não encontrado. Experimente outro CEP!");
+                }
+
+                endereco.Ativo = true;
+                await _enderecoRepository.AddAsync(endereco);
+
+                var cliente = new Cliente
+                {
+                    Nome = clienteRequest.Nome,
+                    Sobrenome = clienteRequest.Sobrenome,
+                    Email = clienteRequest.Email,
+                    Telefone = clienteRequest.Telefone,
+                    CPF = clienteRequest.CPF,
+                    EnderecoId = endereco.Id
+                };
+
+                _logger.LogInformation("Criando cliente: {Nome}", cliente.Nome);
+                var success = await _clienteRepository.AddAsync(cliente);
+                if (!success)
+                {
+                    _logger.LogError("Falha ao criar o cliente: {Nome}", cliente.Nome);
+                    throw new FailCreateUpdateException("Falha ao criar o cliente. Tente novamente!");
+                }
+
+                await transaction.CommitAsync();
+
+                _logger.LogInformation("Cliente criado com sucesso: {Nome}", cliente.Nome);
+                return CreatedAtAction(nameof(GetCliente), new { id = cliente.Id }, cliente);
             }
-
-            endereco.Ativo = true;
-            await _enderecoRepository.AddAsync(endereco);
-
-            var cliente = new Cliente
-            {
-                Nome = clienteRequest.Nome,
-                Sobrenome = clienteRequest.Sobrenome,
-                Email = clienteRequest.Email,
-                Telefone = clienteRequest.Telefone,
-                CPF = clienteRequest.CPF,
-                EnderecoId = endereco.Id
-            };
-
-            _logger.LogInformation("Criando cliente: {Nome}", cliente.Nome);
-            var success = await _clienteRepository.AddAsync(cliente);
-            if (!success)
-            {
-                _logger.LogError("Falha ao criar o cliente: {Nome}", cliente.Nome);
-                throw new FailCreateUpdateException("Falha ao criar o cliente. Tente novamente!");
-            }
-
-            _logger.LogInformation("Cliente criado com sucesso: {Nome}", cliente.Nome);
-            return CreatedAtAction(nameof(GetCliente), new { id = cliente.Id }, cliente);
         }
 
         /// <summary>
@@ -105,29 +128,34 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpDelete("delete")]
         public async Task<IActionResult> Delete(int id, [FromQuery] bool hardDelete = false)
         {
-            _logger.LogInformation("Iniciando exclusão do cliente com ID {Id}", id);
-
-            var cliente = await _clienteRepository.GetByIdAsync(id);
-            if (cliente == null)
+            using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                _logger.LogWarning("Cliente com ID {Id} não encontrado para exclusão", id);
-                throw new NotFoundException("Cliente não encontrado para exclusão. Experimente buscar por outro ID!");
-            }
+                _logger.LogInformation("Iniciando exclusão do cliente com ID {Id}", id);
 
-            if (hardDelete)
-            {
-                _logger.LogInformation("Realizando hard delete para o cliente com ID {Id}", id);
-                await _clienteRepository.DeleteAsync(cliente.Id);
-            }
-            else
-            {
-                _logger.LogInformation("Realizando soft delete para o cliente com ID {Id}", id);
-                cliente.Ativo = false;
-                await _clienteRepository.UpdateAsync(cliente);
-            }
+                var cliente = await _clienteRepository.GetByIdAsync(id);
+                if (cliente == null)
+                {
+                    _logger.LogWarning("Cliente com ID {Id} não encontrado para exclusão", id);
+                    throw new NotFoundException("Cliente não encontrado para exclusão. Experimente buscar por outro ID!");
+                }
 
-            _logger.LogInformation("Cliente com ID {Id} excluído com sucesso. Hard Delete: {HardDelete}", id, hardDelete);
-            return Ok("Excluído com sucesso!");
+                if (hardDelete)
+                {
+                    _logger.LogInformation("Realizando hard delete para o cliente com ID {Id}", id);
+                    await _clienteRepository.DeleteAsync(cliente.Id);
+                }
+                else
+                {
+                    _logger.LogInformation("Realizando soft delete para o cliente com ID {Id}", id);
+                    cliente.Ativo = false;
+                    await _clienteRepository.UpdateAsync(cliente);
+                }
+
+                await transaction.CommitAsync();
+
+                _logger.LogInformation("Cliente com ID {Id} excluído com sucesso. Hard Delete: {HardDelete}", id, hardDelete);
+                return Ok("Excluído com sucesso!");
+            }
         }
 
         /// <summary>
@@ -136,31 +164,36 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpPut("update")]
         public async Task<IActionResult> PutCliente(int id, [FromBody] ClienteUpdateRequest clienteUpdateRequest)
         {
-            _logger.LogInformation("Atualizando cliente com ID: {Id}", id);
-
-            var cliente = await _clienteRepository.GetByIdAsync(id);
-            if (cliente == null)
+            using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                _logger.LogWarning("Cliente com ID: {Id} não encontrado.", id);
-                throw new NotFoundException("Cliente não encontrado. Experimente buscar por outro ID!");
+                _logger.LogInformation("Atualizando cliente com ID: {Id}", id);
+
+                var cliente = await _clienteRepository.GetByIdAsync(id);
+                if (cliente == null)
+                {
+                    _logger.LogWarning("Cliente com ID: {Id} não encontrado.", id);
+                    throw new NotFoundException("Cliente não encontrado. Experimente buscar por outro ID!");
+                }
+
+                cliente.Nome = clienteUpdateRequest.Nome;
+                cliente.Sobrenome = clienteUpdateRequest.Sobrenome;
+                cliente.Email = clienteUpdateRequest.Email;
+                cliente.Telefone = clienteUpdateRequest.Telefone;
+                cliente.CPF = clienteUpdateRequest.CPF;
+
+                _logger.LogInformation("Atualizando cliente: {Nome}", cliente.Nome);
+                var success = await _clienteRepository.UpdateAsync(cliente);
+                if (!success)
+                {
+                    _logger.LogError("Falha ao atualizar o cliente: {Nome}", cliente.Nome);
+                    throw new FailCreateUpdateException("Falha ao atualizar o cliente. Tente novamente!");
+                }
+
+                await transaction.CommitAsync();
+
+                _logger.LogInformation("Cliente atualizado com sucesso: {Nome}", cliente.Nome);
+                return Ok("Cliente atualizado com sucesso!");
             }
-
-            cliente.Nome = clienteUpdateRequest.Nome;
-            cliente.Sobrenome = clienteUpdateRequest.Sobrenome;
-            cliente.Email = clienteUpdateRequest.Email;
-            cliente.Telefone = clienteUpdateRequest.Telefone;
-            cliente.CPF = clienteUpdateRequest.CPF;
-
-            _logger.LogInformation("Atualizando cliente: {Nome}", cliente.Nome);
-            var success = await _clienteRepository.UpdateAsync(cliente);
-            if (!success)
-            {
-                _logger.LogError("Falha ao atualizar o cliente: {Nome}", cliente.Nome);
-                throw new FailCreateUpdateException("Falha ao atualizar o cliente. Tente novamente!");
-            }
-
-            _logger.LogInformation("Cliente atualizado com sucesso: {Nome}", cliente.Nome);
-            return Ok("Cliente atualizado com sucesso!");
         }
 
         /// <summary>
@@ -169,32 +202,37 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpPatch("activate")]
         public async Task<IActionResult> PatchCliente(int id, bool ativo)
         {
-            _logger.LogInformation("Atualizando status do cliente com ID: {Id}", id);
-
-            var cliente = await _clienteRepository.GetByIdActivateAsync(id);
-            if (cliente == null)
+            using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                _logger.LogWarning("Cliente com ID: {Id} não encontrado.", id);
-                throw new NotFoundException("Cliente não encontrado. Experimente buscar por outro ID!");
-            }
+                _logger.LogInformation("Atualizando status do cliente com ID: {Id}", id);
 
-            if (cliente.Ativo == ativo)
-            {
-                _logger.LogWarning("Status do cliente já está como: {Ativo}", ativo);
-                throw new FailCreateUpdateException("Status do cliente já está como desejado.");
-            }
-            cliente.Ativo = ativo;
+                var cliente = await _clienteRepository.GetByIdActivateAsync(id);
+                if (cliente == null)
+                {
+                    _logger.LogWarning("Cliente com ID: {Id} não encontrado.", id);
+                    throw new NotFoundException("Cliente não encontrado. Experimente buscar por outro ID!");
+                }
 
-            _logger.LogInformation("Atualizando status do cliente: {Nome}", cliente.Nome);
-            var success = await _clienteRepository.UpdateAsync(cliente);
-            if (!success)
-            {
-                _logger.LogError("Falha ao atualizar o status do cliente: {Nome}", cliente.Nome);
-                throw new FailCreateUpdateException("Falha ao atualizar o status do cliente. Tente novamente!");
-            }
+                if (cliente.Ativo == ativo)
+                {
+                    _logger.LogWarning("Status do cliente já está como: {Ativo}", ativo);
+                    throw new FailCreateUpdateException("Status do cliente já está como desejado.");
+                }
+                cliente.Ativo = ativo;
 
-            _logger.LogInformation("Status do cliente atualizado com sucesso: {Nome}", cliente.Nome);
-            return Ok("Status do cliente atualizado com sucesso!");
+                _logger.LogInformation("Atualizando status do cliente: {Nome}", cliente.Nome);
+                var success = await _clienteRepository.UpdateAsync(cliente);
+                if (!success)
+                {
+                    _logger.LogError("Falha ao atualizar o status do cliente: {Nome}", cliente.Nome);
+                    throw new FailCreateUpdateException("Falha ao atualizar o status do cliente. Tente novamente!");
+                }
+
+                await transaction.CommitAsync();
+
+                _logger.LogInformation("Status do cliente atualizado com sucesso: {Nome}", cliente.Nome);
+                return Ok("Status do cliente atualizado com sucesso!");
+            }
         }
     }
 }
