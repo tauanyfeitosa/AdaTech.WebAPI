@@ -3,11 +3,11 @@ using AdaTech.WebAPI.DadosLibrary.Repository;
 using AdaTech.WebAPI.SistemaVendas.Utilities.DTO.ModelRequest;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Filters;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Services;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using AdaTech.WebAPI.DadosLibrary.Data;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Services.ObjectService;
 
 namespace AdaTech.WebAPI.SistemaVendas.Controllers
 {
@@ -23,15 +23,19 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         private readonly ILogger<ClienteController> _logger;
         private readonly DataContext _context;
         private readonly GenericsGetService<Cliente> _genericsGetService;
+        private readonly GenericsDeleteService<Cliente> _genericsDeleteService;
 
         public ClienteController(IRepository<Cliente> clienteRepository, IRepository<Endereco> enderecoRepository, 
-            EnderecoService enderecoService, ILogger<ClienteController> logger, DataContext dataContext, GenericsGetService<Cliente> genericsService)
+            EnderecoService enderecoService, ILogger<ClienteController> logger, DataContext dataContext, 
+            GenericsGetService<Cliente> genericsService, GenericsDeleteService<Cliente> genericsDeleteService)
         {
             _clienteRepository = clienteRepository;
             _enderecoRepository = enderecoRepository;
             _enderecoService = enderecoService;
             _logger = logger;
             _genericsGetService = genericsService;
+            _genericsDeleteService = genericsDeleteService;
+            _context = dataContext;
         }
 
         /// <summary>
@@ -78,7 +82,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
                 }
 
                 endereco.Ativo = true;
-                await _enderecoRepository.AddAsync(endereco);
+                await _enderecoRepository.UpdateAsync(endereco);
 
                 var cliente = new Cliente
                 {
@@ -92,6 +96,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
 
                 _logger.LogInformation("Criando cliente: {Nome}", cliente.Nome);
                 var success = await _clienteRepository.AddAsync(cliente);
+
                 if (!success)
                 {
                     _logger.LogError("Falha ao criar o cliente: {Nome}", cliente.Nome);
@@ -111,34 +116,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpDelete("delete")]
         public async Task<IActionResult> Delete(int id, [FromQuery] bool hardDelete = false)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
-            {
-                _logger.LogInformation("Iniciando exclusão do cliente com ID {Id}", id);
-
-                var cliente = await _clienteRepository.GetByIdAsync(id);
-                if (cliente == null)
-                {
-                    _logger.LogWarning("Cliente com ID {Id} não encontrado para exclusão", id);
-                    throw new NotFoundException("Cliente não encontrado para exclusão. Experimente buscar por outro ID!");
-                }
-
-                if (hardDelete)
-                {
-                    _logger.LogInformation("Realizando hard delete para o cliente com ID {Id}", id);
-                    await _clienteRepository.DeleteAsync(cliente.Id);
-                }
-                else
-                {
-                    _logger.LogInformation("Realizando soft delete para o cliente com ID {Id}", id);
-                    cliente.Ativo = false;
-                    await _clienteRepository.UpdateAsync(cliente);
-                }
-
-                await transaction.CommitAsync();
-
-                _logger.LogInformation("Cliente com ID {Id} excluído com sucesso. Hard Delete: {HardDelete}", id, hardDelete);
-                return Ok("Excluído com sucesso!");
-            }
+            return Ok(await _genericsDeleteService.DeleteAsync(_clienteRepository, _logger, _context, id, hardDelete));
         }
 
         /// <summary>

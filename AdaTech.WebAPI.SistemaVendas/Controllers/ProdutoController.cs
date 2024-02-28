@@ -18,14 +18,16 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         private readonly ILogger<ProdutoController> _logger;
         private readonly DataContext _context;
         private readonly GenericsGetService<Produto> _genericsGetService;
+        private readonly GenericsDeleteService<Produto> _genericsDeleteService;
 
         public ProdutoController(IRepository<Produto> produtoRepository, ILogger<ProdutoController> logger,
-            DataContext dataContext, GenericsGetService<Produto> genericsService)
+            DataContext dataContext, GenericsGetService<Produto> genericsService, GenericsDeleteService<Produto> genericsDeleteService)
         {
             _produtoRepository = produtoRepository;
             _logger = logger;
             _context = dataContext;
             _genericsGetService = genericsService;
+            _genericsDeleteService = genericsDeleteService;
         }
 
         /// <summary>
@@ -127,31 +129,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpDelete("delete")]
         public async Task<IActionResult> Delete(int id, bool hardDelete = false)
         {
-            using (var transaction = _context.Database.BeginTransaction())
-            {
-                _logger.LogInformation("Iniciando exclusão do produto com ID {Id}", id);
-                var produto = _produtoRepository.GetByIdAsync(id).Result;
-                if (produto == null)
-                {
-                    _logger.LogWarning("Produto com ID {Id} não encontrado para exclusão", id);
-                    throw new NotFoundException("Produto não encontrado para exclusão. Experimente buscar por outro ID!");
-                }
-
-                if (hardDelete)
-                {
-                    _logger.LogInformation("Realizando hard delete para o produto com ID {Id}", id);
-                    _produtoRepository.DeleteAsync(produto.Id);
-                }
-
-                _logger.LogInformation("Realizando soft delete para o produto com ID {Id}", id);
-                produto.Ativo = false;
-                _produtoRepository.UpdateAsync(produto);
-
-                await transaction.CommitAsync();
-
-                _logger.LogInformation("Produto com ID {Id} excluído com sucesso. Hard Delete: {HardDelete}", id, hardDelete);
-                return Ok("O produto foi deletado com sucesso!");
-            }
+            return Ok(await _genericsDeleteService.DeleteAsync(_produtoRepository, _logger, _context, id, hardDelete));
         }
 
         /// <summary>
