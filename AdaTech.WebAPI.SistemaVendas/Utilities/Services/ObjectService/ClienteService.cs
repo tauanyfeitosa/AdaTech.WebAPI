@@ -1,7 +1,7 @@
 ﻿using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
 using AdaTech.WebAPI.DadosLibrary.Repository;
 
-namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services
+namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services.ObjectService
 {
     public class ClienteService
     {
@@ -22,6 +22,24 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services
                 return null;
 
             return cliente;
+        }
+
+        public async Task<IEnumerable<Cliente>> GetClientAdress(int id)
+        {
+            var clientes = await _repository.GetAllAsync();
+
+            var clientesAdress = clientes.Where(c => c.EnderecoId == id);
+
+            if (clientesAdress == null)
+                return null;
+
+            return clientesAdress;
+        }
+
+        public async Task<bool> UpdateAsync(Cliente cliente)
+        {
+            var success = await _repository.UpdateAsync(cliente);
+            return success;
         }
     }
 }

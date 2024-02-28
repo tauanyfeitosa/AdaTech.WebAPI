@@ -30,6 +30,13 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService
 
         public async Task<T> GetByIdAsync(IRepository<T> repository, ILogger logger, int id)
         {
+
+            if (id == default)
+            {
+                logger.LogWarning($"ID inválido: {id}");
+                throw new ErrorInputUserException("ID inválido. Tente buscar por outro ID!");
+            }
+
             var entity = await repository.GetByIdAsync(id);
             if (entity == null)
             {
