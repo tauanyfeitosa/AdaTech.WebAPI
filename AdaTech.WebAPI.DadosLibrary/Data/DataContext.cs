@@ -27,11 +27,6 @@ namespace AdaTech.WebAPI.DadosLibrary.Data
                 .WithMany(c => c.Vendas)
                 .HasForeignKey(v => v.ClienteId);
 
-            modelBuilder.Entity<Venda>()
-                .HasMany(v => v.ItensVendas)
-                .WithOne(iv => iv.Venda)
-                .HasForeignKey(iv => iv.VendaId);
-
             modelBuilder.Entity<ItemVenda>()
                 .HasOne(iv => iv.Produto)
                 .WithMany()
@@ -59,9 +54,8 @@ namespace AdaTech.WebAPI.DadosLibrary.Data
 
             modelBuilder.Entity<Cliente>()
                 .HasOne(c => c.Endereco)
-                .WithMany(e => e.Clientes)
-                .HasForeignKey(c => c.EnderecoId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .WithMany()
+                .HasForeignKey(c => c.EnderecoId);
 
             modelBuilder.Entity<ItemVenda>()
                 .HasOne(iv => iv.Venda)

@@ -1,4 +1,5 @@
 ﻿using AdaTech.WebAPI.DadosLibrary.DTO.Enums;
+using System.Text.Json.Serialization;
 
 namespace AdaTech.WebAPI.DadosLibrary.DTO.Objects
 {

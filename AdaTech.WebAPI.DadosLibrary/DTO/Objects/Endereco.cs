@@ -1,4 +1,6 @@
 ﻿
+using System.Text.Json.Serialization;
+
 namespace AdaTech.WebAPI.DadosLibrary.DTO.Objects
 {
     public class Endereco
@@ -10,8 +12,7 @@ namespace AdaTech.WebAPI.DadosLibrary.DTO.Objects
         public string Cidade { get; set; }
         public string Estado { get; set; }
         public string CEP { get; set; }
-        public string Complemento { get; set; }
-        public IEnumerable<Cliente> Clientes { get; set; }
+        public string? Complemento { get; set; }
         public bool Ativo { get; set; } = true;
     }
 }
