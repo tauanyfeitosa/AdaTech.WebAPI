@@ -1,11 +1,6 @@
 ﻿using AdaTech.WebAPI.DadosLibrary.Data;
 using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
 {
@@ -31,30 +26,42 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
             if (existingEndereco == null)
             {
                 await _context.Enderecos.AddAsync(endereco);
-                var result = await _context.SaveChangesAsync();
-                return result > 0;
-
+                return await _context.SaveChangesAsync() > 0;
+            } else if (existingEndereco != null && !existingEndereco.Ativo)
+            {
+                existingEndereco.Ativo = true;
+                return await _context.SaveChangesAsync() > 0;
             }
-
-            return false;
+            else
+            {
+                 return false;
+            }
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
             var entity = await _context.Enderecos.FindAsync(id);
-            if (entity != null)
+
+            if (entity == null)
             {
-                _context.Enderecos.Remove(entity);
-                return await _context.SaveChangesAsync() > 0;
+                return false;
             }
-            return false;
+
+            _context.Enderecos.Remove(entity);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> UpdateAsync(Endereco entity)
+        {
+            _context.Entry(entity).State = EntityState.Modified;
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task<Endereco> GetByIdAsync(int id)
         {
             var entity = await _context.Enderecos.FindAsync(id);
 
-            if (!entity.Ativo)
+            if (entity == null || !entity.Ativo)
                 return null;
 
             return entity;
@@ -76,11 +83,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
             return enderecos;
         }
 
-        public async Task<bool> UpdateAsync(Endereco entity)
-        {
-            _context.Entry(entity).State = EntityState.Modified;
-            return await _context.SaveChangesAsync() > 0;
-        }
+        
 
         public async Task<Endereco> GetByCEPAsync(string cep)
         {

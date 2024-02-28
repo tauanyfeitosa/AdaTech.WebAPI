@@ -38,7 +38,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
         {
             var entity = await _context.ItensVenda.FindAsync(id);
 
-            if (!entity.Ativo)
+            if (entity == null || !entity.Ativo)
                 return null;
 
             return entity;

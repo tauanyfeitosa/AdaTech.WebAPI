@@ -21,7 +21,6 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
         public async Task<bool> AddAsync(Venda entity)
         {
             await _context.Vendas.AddAsync(entity);
-
             return await _context.SaveChangesAsync() > 0;
         }
 
@@ -33,12 +32,18 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
                 _context.Vendas.Remove(entity);
                 return await _context.SaveChangesAsync() > 0;
             }
+
             return false;
         }
 
         public async Task<Venda> GetByIdAsync(int id)
         {
-            return await _context.Vendas.FindAsync(id);
+            var venda = await _context.Vendas.FindAsync(id);
+
+            if (venda == null || !venda.Ativo)
+                return null;
+            
+            return venda;
         }
 
         public async Task<IEnumerable<Venda>> GetAllAsync()
@@ -66,10 +71,6 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
         public async Task<Venda> GetByIdActivateAsync(int id)
         {
             var entity = await _context.Vendas.FindAsync(id);
-
-            if (!entity.Ativo)
-                return null;
-
             return entity;
         }
     }

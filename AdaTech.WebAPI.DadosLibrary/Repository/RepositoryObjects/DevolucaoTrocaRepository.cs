@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
 {
-    public class DevolucaoTrocaRepository: IRepository<DevolucaoTroca>
+    public class DevolucaoTrocaRepository : IRepository<DevolucaoTroca>
     {
         private readonly DataContext _context;
 
@@ -21,7 +21,6 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
         public async Task<bool> AddAsync(DevolucaoTroca entity)
         {
             await _context.DevolucoesTrocas.AddAsync(entity);
-
             return await _context.SaveChangesAsync() > 0;
         }
 
@@ -33,6 +32,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
                 _context.DevolucoesTrocas.Remove(entity);
                 return await _context.SaveChangesAsync() > 0;
             }
+
             return false;
         }
 
@@ -40,7 +40,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
         {
             var entity = await _context.DevolucoesTrocas.FindAsync(id);
 
-            if (!entity.Ativo)
+            if (entity == null || !entity.Ativo)
                 return null;
 
             return entity;

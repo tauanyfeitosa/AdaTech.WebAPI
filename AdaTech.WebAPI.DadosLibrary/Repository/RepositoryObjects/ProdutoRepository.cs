@@ -1,11 +1,6 @@
 ﻿using AdaTech.WebAPI.DadosLibrary.Data;
 using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
 {
@@ -25,8 +20,8 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
         public async Task<bool> AddAsync(Produto entity)
         {
             await _context.Produtos.AddAsync(entity);
-
             return await _context.SaveChangesAsync() > 0;
+
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -37,6 +32,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
                 _context.Produtos.Remove(entity);
                 return await _context.SaveChangesAsync() > 0;
             }
+            
             return false;
         }
 
@@ -44,7 +40,7 @@ namespace AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects
         {
             var entity = await _context.Produtos.FindAsync(id);
 
-            if (!entity.Ativo)
+            if (entity == null || !entity.Ativo)
                 return null;
 
             return entity;
