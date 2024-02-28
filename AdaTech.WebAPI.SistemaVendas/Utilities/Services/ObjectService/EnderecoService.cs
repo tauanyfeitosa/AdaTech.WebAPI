@@ -6,7 +6,7 @@ using AdaTech.WebAPI.SistemaVendas.Utilities.DTO.ModelRequest;
 using System.Net.Http;
 using System.Text.Json;
 
-namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services
+namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services.ObjectService
 {
     public class EnderecoService
     {
@@ -45,7 +45,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services
 
                 if (endereco != null)
                 {
-                    await enderecoRepository.AddAsync(endereco);
+                    enderecoRepository.AddAsync(endereco);
                     return endereco;
                 }
                 else
@@ -53,11 +53,12 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services
                     return null;
                 }
 
-            } else
+            }
+            else
             {
                 throw new Exception("EnderecoRepository não é do tipo EnderecoRepository");
             }
-            
+
         }
 
         private async Task<EnderecoDTO> GetEnderecoFromApi(string cep)
@@ -76,12 +77,12 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services
             return enderecoDto;
         }
 
-        private async Task<bool> CompareEndereco (Endereco endereco, EnderecoDTO enderecoDTO)
+        private async Task<bool> CompareEndereco(Endereco endereco, EnderecoDTO enderecoDTO)
         {
             return await Task.Run(() => endereco.Rua == enderecoDTO.Rua && endereco.Bairro == enderecoDTO.Bairro && endereco.Cidade == enderecoDTO.Cidade && endereco.Estado == enderecoDTO.Estado && endereco.CEP == enderecoDTO.CEP);
         }
 
-        private async Task<Endereco> TransformarDTO (EnderecoDTO enderecoDTO, string numero, string complemento)
+        private async Task<Endereco> TransformarDTO(EnderecoDTO enderecoDTO, string numero, string complemento)
         {
             return await Task.Run(() => new Endereco
             {
@@ -95,7 +96,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.Services
             });
         }
 
-        public async Task<Endereco> UpdateAdress (Endereco endereco, EnderecoUpdateDTO enderecoUpdateDTO)
+        public async Task<Endereco> UpdateAdress(Endereco endereco, EnderecoUpdateDTO enderecoUpdateDTO)
         {
             endereco.Rua = enderecoUpdateDTO.Rua;
             endereco.Bairro = enderecoUpdateDTO.Bairro;

@@ -6,8 +6,9 @@ using AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger;
 using AdaTech.WebAPI.SistemaVendas.Utilities.DTO;
 using AdaTech.WebAPI.SistemaVendas.Utilities.DTO.ModelRequest;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Services;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Services.ObjectService;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Services.ObjectService.VendaServiceCRUD;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,25 +20,24 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
     public class VendaController : ControllerBase
     {
         private readonly IRepository<Venda> _vendaRepository;
-        private readonly IRepository<ItemVenda> _itemVendaRepository;
         private readonly ILogger<VendaController> _logger;
-        private readonly IRepository<Produto> _produtoRepository;
-        private readonly ClienteService _clienteService;
         private readonly DataContext _context;
         private readonly GenericsGetService<Venda> _genericsGetService;
+        private readonly VendaCreateService _vendaCreateService;
+        private readonly VendaUpdateService _vendaUpdateService;
+        private readonly GenericsDeleteService<Venda> _genericsDeleteService;
 
-        public VendaController(IRepository<Venda> vendaRepository, ILogger<VendaController> logger, 
-            IRepository<Produto> produtoRepository, ClienteService clienteService, 
-            IRepository<ItemVenda> itemVendaRepository, DataContext dataContext,
-            GenericsGetService<Venda> genericsGetService)
+        public VendaController(IRepository<Venda> vendaRepository, ILogger<VendaController> logger, DataContext dataContext,
+            GenericsGetService<Venda> genericsGetService, VendaCreateService vendaCreateService,
+            VendaUpdateService vendaUpdateService, GenericsDeleteService<Venda> genericsDeleteService)
         {
             _vendaRepository = vendaRepository;
             _logger = logger;
-            _produtoRepository = produtoRepository;
-            _clienteService = clienteService;
-            _itemVendaRepository = itemVendaRepository;
             _context = dataContext;
             _genericsGetService = genericsGetService;
+            _vendaCreateService = vendaCreateService;
+            _vendaUpdateService = vendaUpdateService;
+            _genericsDeleteService = genericsDeleteService;
         }
 
         /// <summary>
@@ -75,62 +75,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                List<ItemVenda> itensVenda = new List<ItemVenda>();
-                _logger.LogInformation("Inserindo nova venda.");
-                var cliente = await _clienteService.GetCPFAsync(vendaRequest.ClienteCPF);
-
-                var venda = new Venda
-                {
-                    ClienteId = cliente.Id,
-                    DataVenda = vendaRequest.DataVenda
-                };
-
-                foreach (var itemRequest in vendaRequest.ItensVendas)
-                {
-                    if (itemRequest == null)
-                    {
-                        _logger.LogWarning("Um item de venda recebido é nulo.");
-                        throw new ErrorInputUserException("Um item de venda recebido é nulo. A venda terá que ser refeita.");
-                    }
-
-                    var produto = await _produtoRepository.GetByIdAsync(itemRequest.ProdutoId);
-
-                    if (produto == null)
-                    {
-                        _logger.LogWarning("Produto com ID: {Id} não encontrado.", itemRequest.ProdutoId);
-                        throw new NotFoundException("Alguns produtos não foram encontrados. A venda terá que ser refeita.");
-                    }
-
-                    if (produto.Quantidade < itemRequest.Quantidade)
-                    {
-                        _logger.LogWarning("Produto com ID: {Id} não possui quantidade suficiente em estoque.", itemRequest.ProdutoId);
-                        throw new NotFoundException("Alguns produtos não possuem quantidade suficiente em estoque. A venda terá que ser refeita.");
-                    }
-
-                    produto.Quantidade -= itemRequest.Quantidade;
-                    await _produtoRepository.UpdateAsync(produto);
-
-                    var itemVenda = new ItemVenda
-                    {
-                        ProdutoId = produto.Id,
-                        Quantidade = itemRequest.Quantidade,
-                        ValorTotal = produto.Preco * itemRequest.Quantidade
-                    };
-
-                    itensVenda.Add(itemVenda);
-                }
-
-
-
-                venda.ItensVendas = itensVenda;
-                venda.ValorTotal = itensVenda.Sum(x => x.ValorTotal);
-                var success = await _vendaRepository.AddAsync(venda);
-
-                if (!success)
-                {
-                    _logger.LogError("Falha ao criar a venda.");
-                    throw new FailCreateUpdateException("Falha ao criar a venda. Tente novamente!");
-                }
+                _vendaCreateService.CreateVenda(vendaRequest, _logger);
 
                 await transaction.CommitAsync();
 
@@ -147,24 +92,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                var venda = await _vendaRepository.GetByIdAsync(id);
-                if (venda == null)
-                {
-                    _logger.LogWarning("Venda com ID: {Id} não encontrada.", id);
-                    throw new NotFoundException("Venda não encontrada. Experimente buscar por outro ID!");
-                }
-                var cliente = await _clienteService.GetCPFAsync(vendaDTO.ClienteCPF);
-                venda.ClienteId = cliente.Id;
-                venda.DataVenda = vendaDTO.DataVenda;
-                venda.StatusVenda = vendaDTO.StatusVenda;
-
-                var success = await _vendaRepository.UpdateAsync(venda);
-
-                if (!success)
-                {
-                    _logger.LogError("Falha ao atualizar a venda.");
-                    throw new FailCreateUpdateException("Falha ao atualizar a venda. Tente novamente!");
-                }
+                _vendaUpdateService.UpdateVenda(vendaDTO, _logger, id);
 
                 await transaction.CommitAsync();
 
@@ -179,46 +107,11 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpDelete("delete")]
         public async Task<IActionResult> Delete(int id, bool hardDelete = false)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
-            {
-                var venda = await _vendaRepository.GetByIdAsync(id);
-                if (venda == null)
-                {
-                    _logger.LogWarning("Venda com ID: {Id} não encontrada.", id);
-                    throw new NotFoundException("Venda não encontrada. Experimente buscar por outro ID!");
-                }
+            var result = await _genericsDeleteService.DeleteAsync(_vendaRepository, _logger, _context, id, hardDelete);
 
-                if (hardDelete)
-                {
-                    var todosItensVenda = await _itemVendaRepository.GetAsync();
+            _logger.LogInformation("Venda deletada com sucesso.");
 
-                    var itensFiltrados = todosItensVenda
-                        .Where(item => item.VendaId == id)
-                        .ToList();
-
-                    if (itensFiltrados.Any())
-                    {
-                        throw new InvalidOperationException($"Não é possível realizar hard delete para a venda com ID {id} porque existem itens de venda associados.");
-                    }
-                    else
-                    {
-                        _logger.LogInformation("Realizando hard delete para a venda com ID {Id}", id);
-                        await _vendaRepository.DeleteAsync(id);
-                    }
-                }
-
-                else
-                {
-                    _logger.LogInformation("Realizando soft delete para a venda com ID {Id}", id);
-                    venda.Ativo = false;
-                    await _vendaRepository.UpdateAsync(venda);
-                }
-
-                await transaction.CommitAsync();
-
-                _logger.LogInformation("Venda deletada com sucesso.");
-                return Ok("Deletado com sucesso!");
-            }
+            return Ok(result);
             
         }
 
@@ -230,21 +123,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                var venda = await _vendaRepository.GetByIdAsync(id);
-                if (venda == null)
-                {
-                    _logger.LogWarning("Venda com ID: {Id} não encontrada.", id);
-                    throw new NotFoundException("Venda não encontrada. Experimente buscar por outro ID!");
-                }
-
-                venda.StatusVenda = statusVenda;
-                var success = await _vendaRepository.UpdateAsync(venda);
-
-                if (!success)
-                {
-                    _logger.LogError("Falha ao atualizar o status da venda.");
-                    throw new FailCreateUpdateException("Falha ao atualizar o status da venda. Tente novamente!");
-                }
+                _vendaUpdateService.UpdateStatus(id, statusVenda, _logger);
 
                 await transaction.CommitAsync();
 
@@ -262,38 +141,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                var venda = await _vendaRepository.GetByIdAsync(id);
-                if (venda == null)
-                {
-                    _logger.LogWarning("Venda com ID: {Id} não encontrada.", id);
-                    throw new NotFoundException("Venda não encontrada. Experimente buscar por outro ID!");
-                }
-                if (venda.Ativo == ativo)
-                {
-                    _logger.LogWarning("Venda com ID: {Id} já está com o status {Ativo}.", id, ativo);
-                    throw new ErrorInputUserException($"Venda com ID: {id} já está com o status {ativo}.");
-                }
-
-                if (!ativo)
-                {
-                    var todosItensVenda = await _itemVendaRepository.GetAsync();
-                    var itensFiltrados = todosItensVenda.Where(item => item.VendaId == id).ToList();
-
-                    foreach (var item in itensFiltrados)
-                    {
-                        item.Ativo = ativo;
-                        await _itemVendaRepository.UpdateAsync(item);
-                    }
-                }
-
-                venda.Ativo = ativo;
-                var success = await _vendaRepository.UpdateAsync(venda);
-
-                if (!success)
-                {
-                    _logger.LogError("Falha ao atualizar o status da venda.");
-                    throw new FailCreateUpdateException("Falha ao atualizar o status da venda. Tente novamente!");
-                }
+                await _vendaUpdateService.UpdateActivate(id, ativo, _logger);
 
                 await transaction.CommitAsync();
 

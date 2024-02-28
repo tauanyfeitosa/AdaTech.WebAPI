@@ -27,6 +27,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Utilities.DTO
         [StringLength(8, ErrorMessage = "O campo CEP deve ter 8 caracteres")]
         public string CEP { get; set; }
 
+        [Required(ErrorMessage = "O campo Complemento é obrigatório")]
         [StringLength(100, ErrorMessage = "O campo Complemento deve ter no máximo 100 caracteres")]
         public string Complemento { get; set; }
     }

@@ -6,8 +6,8 @@ using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger;
 using AdaTech.WebAPI.DadosLibrary.Data;
 using AdaTech.WebAPI.SistemaVendas.Utilities.DTO;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Services;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService;
+using AdaTech.WebAPI.SistemaVendas.Utilities.Services.ObjectService;
 
 
 namespace AdaTech.WebAPI.SistemaVendas.Controllers
@@ -23,19 +23,25 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         private readonly DataContext _context;
         private readonly EnderecoService _enderecoService;
         private readonly GenericsGetService<Endereco> _genericsGetService;
+        private readonly GenericsDeleteService<Endereco> _genericsDeleteService;
+        private readonly ClienteService _clienteService;
 
         public EnderecoController(IRepository<Endereco> enderecoRepository, ILogger<EnderecoController> logger,
-            DataContext dataContext, EnderecoService enderecoService, GenericsGetService<Endereco> genericsService)
+            DataContext dataContext, EnderecoService enderecoService, GenericsGetService<Endereco> genericsService, 
+            GenericsDeleteService<Endereco> genericsDeleteService, ClienteService clienteService)
         {
             _enderecoRepository = enderecoRepository;
             _logger = logger;
             _context = dataContext;
             _enderecoService = enderecoService;
             _genericsGetService = genericsService;
+            _genericsDeleteService = genericsDeleteService;
+            _genericsDeleteService = genericsDeleteService;
+            _clienteService = clienteService;
         }
 
         /// <summary>
-        /// Obtém a lista de todos os endereços.
+        /// Obtém a lista de todos os endereços ativos.
         /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Endereco>>> Get()
@@ -100,34 +106,8 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpDelete("delete")]
         public async Task<IActionResult> Delete(int id, [FromQuery] bool hardDelete = false)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
-            {
-                _logger.LogInformation("Iniciando exclusão do endereço com ID {Id}", id);
-
-                var endereco = await _enderecoRepository.GetByIdAsync(id);
-                if (endereco == null)
-                {
-                    _logger.LogWarning("Endereço com ID {Id} não encontrado para exclusão", id);
-                    throw new NotFoundException("Endereço não encontrado para exclusão. Experimente buscar por outro ID!");
-                }
-
-                if (hardDelete)
-                {
-                    _logger.LogInformation("Realizando hard delete para o endereço com ID {Id}", id);
-                    await _enderecoRepository.DeleteAsync(endereco.Id);
-                }
-                else
-                {
-                    _logger.LogInformation("Realizando soft delete para o endereço com ID {Id}", id);
-                    endereco.Ativo = false;
-                    await _enderecoRepository.UpdateAsync(endereco);
-                }
-
-                await transaction.CommitAsync();
-
-                _logger.LogInformation("Endereço com ID {Id} excluído com sucesso. Hard Delete: {HardDelete}", id, hardDelete);
-                return Ok("Excluído com sucesso!");
-            }
+            var result = await _genericsDeleteService.DeleteAsync(_enderecoRepository, _logger, _context, id, hardDelete);
+            return Ok(result);
         }
 
         /// <summary>
