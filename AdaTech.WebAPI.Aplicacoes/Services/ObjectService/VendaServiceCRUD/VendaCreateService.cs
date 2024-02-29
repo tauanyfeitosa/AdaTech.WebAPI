@@ -20,7 +20,7 @@ namespace AdaTech.WebAPI.Aplicacoes.Services.ObjectService.VendaServiceCRUD
             _produtoRepository = produtoRepository;
         }
 
-        public async void CreateVenda(VendaRequest vendaRequest, ILogger logger)
+        public async Task CreateVenda(VendaRequest vendaRequest, ILogger logger)
         {
             var cliente = await GetClienteAsync(vendaRequest.ClienteCPF, logger);
 

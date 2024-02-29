@@ -7,7 +7,7 @@ namespace AdaTech.WebAPI.Aplicacoes.Attributes
         public override bool IsValid(object value)
         {
             DateTime date = Convert.ToDateTime(value);
-            if (date > DateTime.Now)
+            if (date.Date > DateTime.Now.Date)
             {
                 ErrorMessage = "A data da venda não pode ser no futuro.";
                 return false;

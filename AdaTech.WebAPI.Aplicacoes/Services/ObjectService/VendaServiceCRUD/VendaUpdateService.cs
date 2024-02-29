@@ -21,7 +21,7 @@ namespace AdaTech.WebAPI.Aplicacoes.Services.ObjectService.VendaServiceCRUD
             _itemVendaRepository = repository;
         }
 
-        public async void UpdateVenda(VendaDTO vendaDTO, ILogger logger, int id)
+        public async Task UpdateVenda(VendaDTO vendaDTO, ILogger logger, int id)
         {
             var venda = await VerifyVendaExistsAndStatus(id, false, logger);
             var cliente = await _clienteService.GetCPFAsync(vendaDTO.ClienteCPF);
@@ -38,7 +38,7 @@ namespace AdaTech.WebAPI.Aplicacoes.Services.ObjectService.VendaServiceCRUD
             }
         }
 
-        public async void UpdateStatus (int id, StatusVenda statusVenda, ILogger logger)
+        public async Task UpdateStatus (int id, StatusVenda statusVenda, ILogger logger)
         {
             var venda = await VerifyVendaExistsAndStatus(id, false, logger);
 

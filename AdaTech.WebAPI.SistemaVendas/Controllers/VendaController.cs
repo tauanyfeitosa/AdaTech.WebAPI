@@ -73,7 +73,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                _vendaCreateService.CreateVenda(vendaRequest, _logger);
+                await _vendaCreateService.CreateVenda(vendaRequest, _logger);
 
                 await transaction.CommitAsync();
 
@@ -90,7 +90,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                _vendaUpdateService.UpdateVenda(vendaDTO, _logger, id);
+                await _vendaUpdateService.UpdateVenda(vendaDTO, _logger, id);
 
                 await transaction.CommitAsync();
 
@@ -121,7 +121,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                _vendaUpdateService.UpdateStatus(id, statusVenda, _logger);
+                await _vendaUpdateService.UpdateStatus(id, statusVenda, _logger);
 
                 await transaction.CommitAsync();
 
