@@ -24,7 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AdaTech.WebAPI.Aplicacoes\AdaTech.WebAPI.Aplicacoes.csproj" />
     <ProjectReference Include="..\AdaTech.WebAPI.DadosLibrary\AdaTech.WebAPI.DadosLibrary.csproj" />
+    <ProjectReference Include="..\AdaTech.WebAPI.Entities\AdaTech.WebAPI.Entities.csproj" />
   </ItemGroup>
 
 </Project>

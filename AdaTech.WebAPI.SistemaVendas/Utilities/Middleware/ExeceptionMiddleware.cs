@@ -1,4 +1,4 @@
-﻿using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
+﻿using AdaTech.WebAPI.Aplicacoes.Exceptions;
 
 namespace AdaTech.WebAPI.SistemaVendas.Utilities.Middleware
 {

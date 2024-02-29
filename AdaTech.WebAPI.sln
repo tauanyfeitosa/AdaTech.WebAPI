@@ -3,9 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdaTech.WebAPI.SistemaVendas", "AdaTech.WebAPI.SistemaVendas\AdaTech.WebAPI.SistemaVendas.csproj", "{129AD3ED-6221-4895-A0DF-B6FF83BBB48D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdaTech.WebAPI.SistemaVendas", "AdaTech.WebAPI.SistemaVendas\AdaTech.WebAPI.SistemaVendas.csproj", "{129AD3ED-6221-4895-A0DF-B6FF83BBB48D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdaTech.WebAPI.DadosLibrary", "AdaTech.WebAPI.DadosLibrary\AdaTech.WebAPI.DadosLibrary.csproj", "{9AAF9EA7-07C8-4F0B-8586-19DBBEE605E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdaTech.WebAPI.DadosLibrary", "AdaTech.WebAPI.DadosLibrary\AdaTech.WebAPI.DadosLibrary.csproj", "{9AAF9EA7-07C8-4F0B-8586-19DBBEE605E3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AdaTech.WebAPI.Infrastructure", "AdaTech.WebAPI.Infrastructure", "{2F261A9B-E97A-4A52-A6EE-0C4C18958BE0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AdaTech.WebAPI.Domain", "AdaTech.WebAPI.Domain", "{73249F85-D8C7-4D0C-AC3D-5A8743141402}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdaTech.WebAPI.Entities", "AdaTech.WebAPI.Entities\AdaTech.WebAPI.Entities.csproj", "{66BEAA61-C1F3-4323-9A95-5F32F06442DE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AdaTech.WebAPI.Application", "AdaTech.WebAPI.Application", "{7386E747-791F-41BA-8A4C-FFF0FC349E74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdaTech.WebAPI.Aplicacoes", "AdaTech.WebAPI.Aplicacoes\AdaTech.WebAPI.Aplicacoes.csproj", "{53781C32-C3FD-4F12-A859-85721CA3F43C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AdaTech.WebAPI.Web", "AdaTech.WebAPI.Web", "{C46704C0-6EFE-47D6-8CB1-8E4972641651}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +33,23 @@ Global
 		{9AAF9EA7-07C8-4F0B-8586-19DBBEE605E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AAF9EA7-07C8-4F0B-8586-19DBBEE605E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AAF9EA7-07C8-4F0B-8586-19DBBEE605E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66BEAA61-C1F3-4323-9A95-5F32F06442DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66BEAA61-C1F3-4323-9A95-5F32F06442DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66BEAA61-C1F3-4323-9A95-5F32F06442DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66BEAA61-C1F3-4323-9A95-5F32F06442DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53781C32-C3FD-4F12-A859-85721CA3F43C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53781C32-C3FD-4F12-A859-85721CA3F43C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53781C32-C3FD-4F12-A859-85721CA3F43C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53781C32-C3FD-4F12-A859-85721CA3F43C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{129AD3ED-6221-4895-A0DF-B6FF83BBB48D} = {C46704C0-6EFE-47D6-8CB1-8E4972641651}
+		{9AAF9EA7-07C8-4F0B-8586-19DBBEE605E3} = {2F261A9B-E97A-4A52-A6EE-0C4C18958BE0}
+		{66BEAA61-C1F3-4323-9A95-5F32F06442DE} = {73249F85-D8C7-4D0C-AC3D-5A8743141402}
+		{53781C32-C3FD-4F12-A859-85721CA3F43C} = {7386E747-791F-41BA-8A4C-FFF0FC349E74}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D39993C7-119E-4259-9F41-49CF94E8CB88}

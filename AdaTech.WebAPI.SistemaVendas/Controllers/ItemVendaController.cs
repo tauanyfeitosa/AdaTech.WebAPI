@@ -1,9 +1,8 @@
-﻿using AdaTech.WebAPI.DadosLibrary.Data;
-using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
+﻿using AdaTech.WebAPI.Aplicacoes.Exceptions;
+using AdaTech.WebAPI.Aplicacoes.Services.GenericsService;
+using AdaTech.WebAPI.DadosLibrary.Data;
 using AdaTech.WebAPI.DadosLibrary.Repository;
-using AdaTech.WebAPI.SistemaVendas.Utilities.DTO;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService;
+using AdaTech.WebAPI.Entities.Entity.Objects;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdaTech.WebAPI.SistemaVendas.Controllers

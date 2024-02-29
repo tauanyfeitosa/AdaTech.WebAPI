@@ -1,5 +1,5 @@
-﻿using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
-using AdaTech.WebAPI.DadosLibrary.DTO.Relacional;
+﻿using AdaTech.WebAPI.Entities.Entity.Objects;
+using AdaTech.WebAPI.Entities.Entity.Relacional;
 using Microsoft.EntityFrameworkCore;
 
 namespace AdaTech.WebAPI.DadosLibrary.Data

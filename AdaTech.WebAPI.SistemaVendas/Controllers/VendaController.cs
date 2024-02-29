@@ -1,14 +1,12 @@
-﻿using AdaTech.WebAPI.DadosLibrary.Data;
-using AdaTech.WebAPI.DadosLibrary.DTO.Enums;
-using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
+﻿using AdaTech.WebAPI.Aplicacoes.Attributes.Swagger;
+using AdaTech.WebAPI.Aplicacoes.DTO;
+using AdaTech.WebAPI.Aplicacoes.DTO.ModelRequest;
+using AdaTech.WebAPI.Aplicacoes.Services.GenericsService;
+using AdaTech.WebAPI.Aplicacoes.Services.ObjectService.VendaServiceCRUD;
+using AdaTech.WebAPI.DadosLibrary.Data;
 using AdaTech.WebAPI.DadosLibrary.Repository;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger;
-using AdaTech.WebAPI.SistemaVendas.Utilities.DTO;
-using AdaTech.WebAPI.SistemaVendas.Utilities.DTO.ModelRequest;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Services.ObjectService;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Services.ObjectService.VendaServiceCRUD;
+using AdaTech.WebAPI.Entities.Entity.Enums;
+using AdaTech.WebAPI.Entities.Entity.Objects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -107,7 +105,7 @@ namespace AdaTech.WebAPI.SistemaVendas.Controllers
         [HttpDelete("delete")]
         public async Task<IActionResult> Delete(int id, bool hardDelete = false)
         {
-            var result = await _genericsDeleteService.DeleteAsync(_vendaRepository, _logger, _context, id, hardDelete);
+            var result = await _genericsDeleteService.DeleteAsync(_vendaRepository, _logger, _context, id, hardDelete); ;
 
             _logger.LogInformation("Venda deletada com sucesso.");
 

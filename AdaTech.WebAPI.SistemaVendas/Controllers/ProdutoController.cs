@@ -1,11 +1,11 @@
-﻿using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
-using AdaTech.WebAPI.DadosLibrary.Repository;
-using AdaTech.WebAPI.SistemaVendas.Utilities.DTO.ModelRequest;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Exceptions;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger;
+﻿using AdaTech.WebAPI.DadosLibrary.Repository;
 using Microsoft.AspNetCore.Mvc;
 using AdaTech.WebAPI.DadosLibrary.Data;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService;
+using AdaTech.WebAPI.Aplicacoes.Attributes.Swagger;
+using AdaTech.WebAPI.Entities.Entity.Objects;
+using AdaTech.WebAPI.Aplicacoes.Services.GenericsService;
+using AdaTech.WebAPI.Aplicacoes.DTO.ModelRequest;
+using AdaTech.WebAPI.Aplicacoes.Exceptions;
 
 namespace AdaTech.WebAPI.SistemaVendas.Controllers
 {

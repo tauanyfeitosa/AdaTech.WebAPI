@@ -1,15 +1,15 @@
 
+using AdaTech.WebAPI.Aplicacoes.Attributes.Swagger;
+using AdaTech.WebAPI.Aplicacoes.Services.DeleteInterface;
+using AdaTech.WebAPI.Aplicacoes.Services.GenericsService;
+using AdaTech.WebAPI.Aplicacoes.Services.ObjectService;
+using AdaTech.WebAPI.Aplicacoes.Services.ObjectService.EnderecoServiceCRUD;
+using AdaTech.WebAPI.Aplicacoes.Services.ObjectService.VendaServiceCRUD;
 using AdaTech.WebAPI.DadosLibrary.Data;
-using AdaTech.WebAPI.DadosLibrary.DTO.Objects;
 using AdaTech.WebAPI.DadosLibrary.Repository;
 using AdaTech.WebAPI.DadosLibrary.Repository.RepositoryObjects;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Attributes.Swagger;
+using AdaTech.WebAPI.Entities.Entity.Objects;
 using AdaTech.WebAPI.SistemaVendas.Utilities.Middleware;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Services.DeleteInterface;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Services.GenericsService;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Services.ObjectService;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Services.ObjectService.EnderecoServiceCRUD;
-using AdaTech.WebAPI.SistemaVendas.Utilities.Services.ObjectService.VendaServiceCRUD;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
